@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(validatedBy = NullOrNotBlankValidator.class)
 public @interface NullOrNotBlank {
-    String message() default "{javax.validation.constraints.NullOrNotBlank.message}";
+    String message() default "cannot be empty";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,12 +1,11 @@
 package com.szd.boxgo.controller.user;
 
 import com.szd.boxgo.dto.auth.AuthUserId;
-import com.szd.boxgo.dto.user.ChangePasswordDto;
-import com.szd.boxgo.dto.user.PasswordDto;
-import com.szd.boxgo.dto.user.UserProfileDto;
+import com.szd.boxgo.dto.user.*;
 import com.szd.boxgo.service.UserManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +20,13 @@ public class UserController {
     @GetMapping("/me")
     public UserProfileDto profile(@AuthUserId Long authUserId) {
         return userService.getProfile(authUserId);
+    }
+
+    @PatchMapping("/me")
+    @Operation(summary = "Обновить данные пользователя")
+    public UserDto updateUser(@Valid @RequestBody UserPatchDto userDto,
+                              @AuthUserId Long authUserId) {
+        return userService.update(authUserId, userDto);
     }
 
     @Operation(summary = "Запрос на смену пароля")
