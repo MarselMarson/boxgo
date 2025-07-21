@@ -51,7 +51,7 @@ public class AuthenticationService {
             throw new BadCredentialsException("Email " + request.getEmail() + " уже зарегестрирован");
         }
 
-        boolean isVerificationCodeValid = checkVerificationCode(
+        boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
                 request.getVerificationCode(),
                 request.getEmail(),
                 VerificationPurpose.REGISTRATION.toString());
@@ -82,14 +82,6 @@ public class AuthenticationService {
         } else {
             throw new BadCredentialsException("Код верификации недействителен");
         }
-    }
-
-    private boolean checkVerificationCode(String code, String email, String purpose) {
-        VerificationCode verificationCode = verificationCodeService.getVerificationCode(code, email);
-
-        return (verificationCode.getPurpose().equals(purpose))
-               && (!verificationCode.getIsUsed())
-               && (verificationCode.getExpiresAt().isAfter(OffsetDateTime.now()));
     }
 
     /**
@@ -123,7 +115,7 @@ public class AuthenticationService {
     public void resetPassword(ResetPasswordDto resetPasswordDto) {
         User user = userRepoService.getUserByEmail(resetPasswordDto.getEmail());
 
-        boolean isVerificationCodeValid = checkVerificationCode(
+        boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
                 resetPasswordDto.getVerificationCode(),
                 resetPasswordDto.getEmail(),
                 VerificationPurpose.PASSWORD_RESET.toString());

@@ -37,4 +37,12 @@ public class VerificationCodeService {
         code.setIsUsed(true);
         verificationCodeRepo.save(code);
     }
+
+    public boolean checkVerificationCode(String code, String email, String purpose) {
+        VerificationCode verificationCode = getVerificationCode(code, email);
+
+        return (verificationCode.getPurpose().equals(purpose))
+               && (!verificationCode.getIsUsed())
+               && (verificationCode.getExpiresAt().isAfter(OffsetDateTime.now()));
+    }
 }

@@ -4,6 +4,7 @@ import com.szd.boxgo.dto.user.*;
 import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.VerificationCode;
 import com.szd.boxgo.entity.VerificationPurpose;
+import com.szd.boxgo.exception.CodeNotFoundException;
 import com.szd.boxgo.exception.DataValidationException;
 import com.szd.boxgo.mapper.UserMapper;
 import com.szd.boxgo.repo.UserRepo;
@@ -72,26 +73,33 @@ public class UserManagementService {
         userRepo.save(user);
     }
 
-    public UserProfileDto getProfile(Long authUserId) {
+    public UserDto getProfile(Long authUserId) {
         User user = repoService.getUserById(authUserId);
 
-        return UserProfileDto.builder()
-                .logout(false)
-                .user(userMapper.toDto(user))
-                .build();
+        return userMapper.toDto(user);
     }
 
     public void changePassword(Long userId, ChangePasswordDto dto) {
         User user = repoService.getUserById(userId);
-        if (dto.getOldPassword().equals(dto.getNewPassword())) {
-            throw new DataValidationException("Passwords must be different");
-        }
-        if (!passwordService.isPasswordsEqual(dto.getOldPassword(), user.getPassword())) {
-            throw new DataValidationException("Invalid old password");
-        }
-        user.setPassword(passwordService.encodePassword(dto.getNewPassword()));
 
-        userRepo.save(user);
+        boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
+                dto.getVerificationCode(),
+                user.getEmail(),
+                VerificationPurpose.PASSWORD_CHANGE.toString());
+
+        if (isVerificationCodeValid) {
+            if (dto.getOldPassword().equals(dto.getNewPassword())) {
+                throw new DataValidationException("Passwords must be different");
+            }
+            if (!passwordService.isPasswordsEqual(dto.getOldPassword(), user.getPassword())) {
+                throw new DataValidationException("Invalid old password");
+            }
+            String newEncodedPassword = passwordService.encodePassword(dto.getNewPassword());
+            repoService.changePassword(userId, newEncodedPassword);
+            verificationCodeService.useCode(dto.getVerificationCode(), user.getEmail());
+        } else {
+            throw new CodeNotFoundException("Неверный код подтверждения");
+        }
     }
 
     @Transactional

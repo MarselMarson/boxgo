@@ -18,7 +18,7 @@ public class UserController {
 
     @Operation(summary = "Профиль")
     @GetMapping("/me")
-    public UserProfileDto profile(@AuthUserId Long authUserId) {
+    public UserDto profile(@AuthUserId Long authUserId) {
         return userService.getProfile(authUserId);
     }
 
