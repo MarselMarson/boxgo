@@ -60,7 +60,7 @@ public class SecurityConfiguration {
                         // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/const/**", "/countries/**", "/phoneCodes").permitAll()
-                        .requestMatchers("/hi").permitAll()
+                        .requestMatchers("/hi", "/listings").permitAll()
                         .requestMatchers("/about-us/**", "support-service").permitAll()
                         .requestMatchers("/offer/**").permitAll()
                         .requestMatchers("/.well-known/apple-app-site-association").permitAll()
