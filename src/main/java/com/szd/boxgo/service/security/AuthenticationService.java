@@ -12,7 +12,7 @@ import com.szd.boxgo.entity.VerificationPurpose;
 import com.szd.boxgo.exception.CodeNotFoundException;
 import com.szd.boxgo.mapper.UserMapper;
 import com.szd.boxgo.security.JwtService;
-import com.szd.boxgo.service.UserManagementService;
+import com.szd.boxgo.service.user.UserManagementService;
 import com.szd.boxgo.service.VerificationCodeService;
 import com.szd.boxgo.service.user.UserRepoService;
 import com.szd.boxgo.service.user.email.EmailService;

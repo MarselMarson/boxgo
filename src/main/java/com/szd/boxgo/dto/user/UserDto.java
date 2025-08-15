@@ -29,6 +29,6 @@ public class UserDto implements Serializable {
     String photoUrl;
 
     @Schema(description = "Дата создания аккаунта")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     OffsetDateTime createdAt;
 }

@@ -14,6 +14,7 @@ import java.util.List;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
+    @Mapping(target = "photoUrl", source = "photo.url")
     UserDto toDto(User user);
 
     @Mapping(target = "createdAt", ignore = true)
@@ -24,6 +25,8 @@ public interface UserMapper {
         return DateUtil.offsetToString(date);
     }
 
+    @Mapping(target = "photo", ignore = true)
+    @Mapping(target = "photoUrl", ignore = true)
     void updateEntity(UserPatchDto dto, @MappingTarget User entity);
 
     default List<UserDto> toUserDots(List<User> users) {

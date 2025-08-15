@@ -36,10 +36,19 @@ public class User implements UserDetails {
     @Column(name = "email")
     String email;
 
+    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinTable(
+            name = "user_files",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_id")
+    )
+    File photo;
+
     @Column(name = "photo_url")
     String photoUrl;
 
     @Column(name = "is_deleted")
+    @Builder.Default
     Boolean isDeleted = false;
 
     @CreationTimestamp

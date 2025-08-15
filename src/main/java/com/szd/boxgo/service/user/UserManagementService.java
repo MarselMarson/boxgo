@@ -1,6 +1,10 @@
-package com.szd.boxgo.service;
+package com.szd.boxgo.service.user;
 
-import com.szd.boxgo.dto.user.*;
+import com.szd.boxgo.dto.user.ChangePasswordDto;
+import com.szd.boxgo.dto.user.CreateUserDto;
+import com.szd.boxgo.dto.user.UserDto;
+import com.szd.boxgo.dto.user.UserPatchDto;
+import com.szd.boxgo.entity.File;
 import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.VerificationCode;
 import com.szd.boxgo.entity.VerificationPurpose;
@@ -8,8 +12,9 @@ import com.szd.boxgo.exception.CodeNotFoundException;
 import com.szd.boxgo.exception.DataValidationException;
 import com.szd.boxgo.mapper.UserMapper;
 import com.szd.boxgo.repo.UserRepo;
+import com.szd.boxgo.service.FileService;
+import com.szd.boxgo.service.VerificationCodeService;
 import com.szd.boxgo.service.security.PasswordService;
-import com.szd.boxgo.service.user.UserRepoService;
 import com.szd.boxgo.service.user.email.MailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +34,7 @@ public class UserManagementService {
     private final PasswordService passwordService;
     private final VerificationCodeService verificationCodeService;
     private final MailService mailService;
+    private final FileService fileService;
 
     public User create(@Valid CreateUserDto newUserDto) {
         User user = User.builder()
@@ -50,6 +56,18 @@ public class UserManagementService {
 
         userMapper.updateEntity(dto, user);
 
+        if (!user.getPhotoUrl().equals(dto.getPhotoUrl())) {
+            if (dto.getPhotoUrl() != null && !dto.getPhotoUrl().isBlank()) {
+                String fileName = fileService.getNameFromUrl(dto.getPhotoUrl());
+                File photo = fileService.getByFileName(fileName);
+                user.setPhoto(photo);
+                user.setPhotoUrl(photo.getUrl());
+            } else {
+                user.setPhoto(null);
+                user.setPhotoUrl(null);
+            }
+        }
+
         User savedUser = userRepo.save(user);
 
         return userMapper.toDto(savedUser);
@@ -65,12 +83,25 @@ public class UserManagementService {
         user.setEmail(null);
         user.setFirstName(null);
         user.setLastName(null);
-        user.setPhotoUrl(null);
         user.setPassword(null);
+
+        user.setPhoto(null);
+        user.setPhotoUrl(null);
+
         user.setIsDeleted(true);
         user.setDeletedAt(OffsetDateTime.now());
 
         userRepo.save(user);
+    }
+
+    public UserDto removePhotoUrl(Long userId) {
+        User user = repoService.getUserById(userId);
+        user.setPhoto(null);
+        user.setPhotoUrl(null);
+
+        User savedUser = userRepo.save(user);
+
+        return userMapper.toDto(savedUser);
     }
 
     public UserDto getProfile(Long authUserId) {

@@ -1,8 +1,11 @@
 package com.szd.boxgo.controller.user;
 
 import com.szd.boxgo.dto.auth.AuthUserId;
-import com.szd.boxgo.dto.user.*;
-import com.szd.boxgo.service.UserManagementService;
+import com.szd.boxgo.dto.user.ChangePasswordDto;
+import com.szd.boxgo.dto.user.PasswordDto;
+import com.szd.boxgo.dto.user.UserDto;
+import com.szd.boxgo.dto.user.UserPatchDto;
+import com.szd.boxgo.service.user.UserManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,5 +50,9 @@ public class UserController {
         userService.deactivate(userId, dto.getPassword());
     }
 
-
+    @DeleteMapping("/me/photoUrl")
+    @Operation(summary = "Удалить фото")
+    public UserDto deleteUserPhoto(@AuthUserId Long userId) {
+        return userService.removePhotoUrl(userId);
+    }
 }

@@ -47,7 +47,6 @@ dependencies {
      */
     implementation("org.liquibase:liquibase-core")
     runtimeOnly("org.postgresql:postgresql")
-    implementation("com.dropbox.core:dropbox-core-sdk:7.0.0")
     implementation("software.amazon.awssdk:s3:2.28.7")
     implementation("software.amazon.awssdk:s3-transfer-manager:2.28.7")
     implementation("org.hibernate.orm:hibernate-spatial:6.6.1.Final")
@@ -68,6 +67,7 @@ dependencies {
     implementation("commons-io:commons-io:2.16.1")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.18.2")
+    implementation("org.jetbrains:annotations:17.0.0")
 
 
     /**
