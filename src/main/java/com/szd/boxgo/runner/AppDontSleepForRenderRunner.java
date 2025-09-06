@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static java.lang.Thread.sleep;
 
-//@Component
+@Component
 public class AppDontSleepForRenderRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
