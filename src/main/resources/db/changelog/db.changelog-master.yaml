@@ -5,3 +5,7 @@ databaseChangeLog:
       file: db/changelog/changeset/boxgo_V011__cities.sql
   - include:
       file: db/changelog/changeset/boxgo_V012__files.sql
+  - include:
+      file: db/changelog/changeset/boxgo_V012__listings.sql
+  - include:
+      file: db/changelog/changeset/boxgo_V013__packages.sql

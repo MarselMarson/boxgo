@@ -1,19 +1,22 @@
 package com.szd.boxgo.controller;
 
-import com.szd.boxgo.dto.*;
-import com.szd.boxgo.dto.user.UserDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.time.OffsetDateTime;
-import java.util.List;
+import com.szd.boxgo.dto.ListingDto;
+import com.szd.boxgo.dto.NewListingDto;
+import com.szd.boxgo.dto.auth.AuthUserId;
+import com.szd.boxgo.service.ListingService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/listings")
+@RequiredArgsConstructor
 public class ListingsController {
+    private final ListingService listingService;
 
-    @GetMapping
+    /*@GetMapping
     public List<ListingDto> get() {
         UserDto user = UserDto.builder()
                 .id(123L)
@@ -67,7 +70,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
                 ListingDto.builder()
@@ -82,7 +85,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
 
@@ -105,7 +108,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
 
@@ -122,7 +125,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
 
@@ -139,7 +142,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
 
@@ -162,7 +165,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
 
@@ -185,7 +188,7 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build(),
 
@@ -202,9 +205,26 @@ public class ListingsController {
                         ))
                         .availablePackages(List.of(package1, package2))
                         .user(user)
-                        .isFavorite(false)
+                        .isFavourite(false)
                         .createdAt(OffsetDateTime.parse("2025-07-19T00:00:00Z"))
                         .build()
         );
+    }*/
+
+    @GetMapping
+    public Page<ListingDto> getAll(@PageableDefault(size = 15) Pageable pageable) {
+        return listingService.getAll(pageable);
+    }
+
+    @PostMapping("/new")
+    public ListingDto create(
+            @AuthUserId Long userId,
+            @RequestBody NewListingDto listing) {
+        return listingService.create(userId, listing);
+    }
+
+    @GetMapping("/get/{id}")
+    public ListingDto getById(@PathVariable Long id) {
+        return listingService.getById(id);
     }
 }
