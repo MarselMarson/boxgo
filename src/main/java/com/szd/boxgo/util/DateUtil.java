@@ -1,9 +1,7 @@
 package com.szd.boxgo.util;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
@@ -46,5 +44,16 @@ public class DateUtil {
         return dateTime
                 .atZoneSameInstant(ZoneId.systemDefault())
                 .toLocalDateTime();
+    }
+
+    public static LocalDateTime toLocalDate(OffsetDateTime utcTs, String zoneId) {
+        return utcTs.atZoneSameInstant(ZoneOffset.UTC)
+                .withZoneSameInstant(ZoneId.of(zoneId))
+                .toLocalDateTime();
+    }
+
+    public static OffsetDateTime local2359ToUtc(LocalDate localDate, String zoneId) {
+        ZonedDateTime zdt = ZonedDateTime.of(localDate, LocalTime.of(23,59), ZoneId.of(zoneId));
+        return zdt.withZoneSameInstant(ZoneOffset.UTC).toOffsetDateTime();
     }
 }

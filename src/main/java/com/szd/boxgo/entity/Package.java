@@ -57,6 +57,7 @@ public class Package {
     @Column(name = "quantity")
     Integer quantity;
 
+    //TODO type currency .,**
     @Column(name = "price")
     Integer price;
 
@@ -65,16 +66,13 @@ public class Package {
     Boolean isArchived = false;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     OffsetDateTime updatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_at")
     OffsetDateTime deletedAt;
 }

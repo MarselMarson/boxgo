@@ -32,12 +32,10 @@ public class VerificationCode {
     Boolean isUsed;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     @EqualsAndHashCode.Exclude
     OffsetDateTime createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expires_at")
     @EqualsAndHashCode.Exclude
     OffsetDateTime expiresAt;

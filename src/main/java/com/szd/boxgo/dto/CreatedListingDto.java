@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -18,12 +19,19 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Schema(description = "Заявки")
-public class ListingDto {
+public class CreatedListingDto {
     Long id;
-    List<SegmentDto> segments;
+    Short segmentsCount;
+    CityDto fromCity;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    LocalDateTime departureLocalAt;
+
+    CityDto toCity;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    LocalDateTime arrivalLocalAt;
+    List<CreatedSegmentDto> segments;
     List<PackageDto> availablePackages;
     UserDto user;
-    Boolean isFavourite;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     OffsetDateTime createdAt;
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,29 +33,37 @@ public class Listing {
     @Fetch(FetchMode.JOIN)
     User owner;
 
+    @Column(name = "segments_count")
+    Short segmentsCount;
+
     @Column(name = "is_archived")
     @Builder.Default
     Boolean isArchived = false;
 
-    @Column(name = "has_available_packages")
-    @Builder.Default
-    Boolean hasAvailablePackages = false;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "next_departure_at")
-    OffsetDateTime nextDepartureAt;
+    @ManyToOne
+    @JoinColumn(name = "first_from_city_id")
+    City firstFromCity;
+
+    @Column(name = "first_departure_local")
+    LocalDateTime firstDepartureLocalAt;
+
+    @ManyToOne
+    @JoinColumn(name = "last_to_city_id")
+    City lastToCity;
+
+    @Column(name = "last_arrival_local")
+    LocalDateTime lastArrivalLocalAt;
+
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     OffsetDateTime updatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "archived_at")
     OffsetDateTime archivedAt;
 

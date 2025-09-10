@@ -1,12 +1,16 @@
 package com.szd.boxgo.controller;
 
+import com.szd.boxgo.dto.CreatedListingDto;
 import com.szd.boxgo.dto.ListingDto;
 import com.szd.boxgo.dto.NewListingDto;
+import com.szd.boxgo.dto.SegmentDto;
 import com.szd.boxgo.dto.auth.AuthUserId;
+import com.szd.boxgo.service.ListingSegmentFilter;
 import com.szd.boxgo.service.ListingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
@@ -212,12 +216,13 @@ public class ListingsController {
     }*/
 
     @GetMapping
-    public Page<ListingDto> getAll(@PageableDefault(size = 15) Pageable pageable) {
-        return listingService.getAll(pageable);
+    public Page<SegmentDto> getAll(@PageableDefault(size = 15, sort = "departureLocalAt", direction = Sort.Direction.ASC) Pageable pageable,
+                                   ListingSegmentFilter filter) {
+        return listingService.getAll(pageable, filter);
     }
 
     @PostMapping("/new")
-    public ListingDto create(
+    public CreatedListingDto create(
             @AuthUserId Long userId,
             @RequestBody NewListingDto listing) {
         return listingService.create(userId, listing);

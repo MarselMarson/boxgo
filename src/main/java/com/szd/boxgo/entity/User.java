@@ -52,16 +52,13 @@ public class User implements UserDetails {
     Boolean isDeleted = false;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     OffsetDateTime updatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_at")
     OffsetDateTime deletedAt;
 

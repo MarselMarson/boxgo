@@ -15,7 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Schema(description = "Новая посылка")
 public class NewPackageDto {
-    Long parcelTypeId;
+    Integer parcelTypeId;
     List<Long> categoryIds;
     Integer length;
     Integer width;

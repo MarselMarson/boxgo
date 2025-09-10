@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ParcelTypeRepo extends JpaRepository<ParcelType, Long> {
+public interface ParcelTypeRepo extends JpaRepository<ParcelType, Integer> {
 }
