@@ -4,6 +4,7 @@ import com.szd.boxgo.dto.*;
 import com.szd.boxgo.entity.Package;
 import com.szd.boxgo.entity.*;
 import com.szd.boxgo.mapper.ListingMapper;
+import com.szd.boxgo.mapper.PackageMapper;
 import com.szd.boxgo.mapper.RouteSegmentMapper;
 import com.szd.boxgo.repo.*;
 import com.szd.boxgo.service.user.UserRepoService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +33,11 @@ public class ListingService {
     private final CategoryRepo categoryRepo;
     private final ListingRepo listingRepo;
     private final RouteSegmentRepo segmentRepo;
+    private final PackageRepo packageRepo;
 
     private final ListingMapper listingMapper;
     private final RouteSegmentMapper segmentMapper;
+    private final PackageMapper packageMapper;
 
     private final ListingSegmentSpecifications listingSegmentSpecifications;
 
@@ -41,8 +45,8 @@ public class ListingService {
     public CreatedListingDto create(Long userId, NewListingDto newListing) {
         User user = userService.getUserById(userId);
 
-        List<RouteSegment> segments = new ArrayList<>();
-        List<Package> packages = new ArrayList<>();
+        Set<RouteSegment> segments = new HashSet<>();
+        Set<Package> packages = new HashSet<>();
 
         Listing listing = Listing.builder()
                 .owner(user)
@@ -60,7 +64,7 @@ public class ListingService {
         return listingMapper.toCreatedDto(listing);
     }
 
-    private void fillSegmentPackages(List<NewPackageDto> packages, List<RouteSegment> segments) {
+    private void fillSegmentPackages(List<NewPackageDto> packages, Set<RouteSegment> segments) {
         short availableItemCount = 0;
         short availableEnvelopeCount = 0;
         short availableBoxCount = 0;
@@ -127,7 +131,7 @@ public class ListingService {
         }
     }
 
-    private void fillSegments(List<RouteSegment> segments, List<PointDto> points, Listing listing) {
+    private void fillSegments(Set<RouteSegment> segments, List<PointDto> points, Listing listing) {
         List<Long> cityIds = points.stream().map(PointDto::getCityId).toList();
         Map<Long, City> cities = cityRepo.findAllById(cityIds)
                 .stream().collect(Collectors.toMap(City::getId, c -> c));
@@ -180,7 +184,7 @@ public class ListingService {
         }
     }
 
-    private void fillPackages(List<Package> packages, List<NewPackageDto> newPackages, Listing listing) {
+    private void fillPackages(Set<Package> packages, List<NewPackageDto> newPackages, Listing listing) {
         for (NewPackageDto dto : newPackages) {
             ParcelType parcelType = parcelTypeRepo.findById(dto.getParcelTypeId())
                             .orElseThrow(() -> new EntityNotFoundException("parcel type didn't found"));
@@ -215,6 +219,43 @@ public class ListingService {
     public Page<SegmentDto> getAll(Pageable pageable, ListingSegmentFilter filter) {
         Specification<RouteSegment> spec = listingSegmentSpecifications.byFilter(filter);
         Page<RouteSegment> page = segmentRepo.findAll(spec, pageable);
-        return page.map(segmentMapper::toDto);
+
+        if (page.isEmpty()) {
+            return page.map(segmentMapper::toDto);
+        }
+
+        Set<Long> listingIds = page.getContent().stream()
+                .map(segment -> segment.getListing().getId())
+                .collect(Collectors.toSet());
+
+        List<Package> packages = packageRepo.findByIsArchivedFalseAndListingIdIn(listingIds);
+
+        Map<Long, List<PackageDto>> packagesByListingId = packages.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.getListing().getId(),
+                        Collectors.mapping(packageMapper::toDto, Collectors.toList())
+                ));
+
+        return page.map(segment -> {
+            SegmentDto dto = segmentMapper.toDto(segment);
+            dto.setAvailablePackages(packagesByListingId.getOrDefault(segment.getListing().getId(), Collections.emptyList()));
+            return dto;
+        });
+    }
+
+    public Page<CreatedListingDto> getCreated(Long userId, Pageable pageable) {
+        Page<Listing> listings = listingRepo.findAllByOwnerIdOrderByFirstDepartureLocalAt(userId, pageable);
+        return listings.map(listingMapper::toCreatedDto);
+    }
+
+    @Transactional
+    public void archiveById(Long id, Long userId) {
+        Listing listing = listingRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("id for current user not found or already archived"));
+        if (!listing.getOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("no rights for delete");
+        }
+        listing.setIsArchived(true);
+        listing.getRouteSegments().forEach(segment -> segment.setIsArchived(true));
     }
 }

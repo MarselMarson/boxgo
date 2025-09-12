@@ -10,10 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "listings")
@@ -68,10 +65,10 @@ public class Listing {
     OffsetDateTime archivedAt;
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Package> packages = new ArrayList<>();
+    Set<Package> packages = new HashSet<>();
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<RouteSegment> routeSegments = new ArrayList<>();
+    Set<RouteSegment> routeSegments = new HashSet<>();
 
     public List<RouteSegment> getOrderedRouteSegments() {
         if (routeSegments == null) {

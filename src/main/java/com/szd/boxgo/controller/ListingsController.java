@@ -228,8 +228,19 @@ public class ListingsController {
         return listingService.create(userId, listing);
     }
 
+    @GetMapping("/my")
+    public Page<CreatedListingDto> getCreated(@PageableDefault(size = 15) Pageable pageable,
+                                        @AuthUserId Long userId) {
+        return listingService.getCreated(userId, pageable);
+    }
+
     @GetMapping("/get/{id}")
     public ListingDto getById(@PathVariable Long id) {
         return listingService.getById(id);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteById(@PathVariable Long id, @AuthUserId Long userId) {
+        listingService.archiveById(id, userId);
     }
 }
