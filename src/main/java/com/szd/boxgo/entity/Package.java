@@ -18,11 +18,14 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"id", "order"})
 public class Package {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Transient
+    Integer order;
 
     @ManyToOne
     @JoinColumn(name = "listing_id")

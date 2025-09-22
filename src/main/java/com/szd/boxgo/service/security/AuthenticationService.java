@@ -46,25 +46,27 @@ public class AuthenticationService {
      */
     @Transactional
     public JwtAuthenticationResponseDto signUp(@Valid SignUpRequestDto request) {
-        if (emailService.isEmailAlreadyExist(request.getEmail())) {
+        String lowerCaseEmail = request.getEmail().toLowerCase();
+
+        if (emailService.isEmailAlreadyExist(lowerCaseEmail)) {
             throw new BadCredentialsException("Email " + request.getEmail() + " уже зарегестрирован");
         }
 
         boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
                 request.getVerificationCode(),
-                request.getEmail(),
+                lowerCaseEmail,
                 VerificationPurpose.REGISTRATION.toString());
 
         if (isVerificationCodeValid) {
             CreateUserDto signUpUser = CreateUserDto.builder()
-                    .email(request.getEmail())
+                    .email(lowerCaseEmail)
                     .password(passwordService.encodePassword(request.getPassword()))
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
                     .build();
 
             User createdUser = userManagementService.create(signUpUser);
-            verificationCodeService.useCode(request.getVerificationCode(), request.getEmail());
+            verificationCodeService.useCode(request.getVerificationCode(), lowerCaseEmail);
 
             UserDto userDto = userMapper.toDto(createdUser);
 
@@ -90,8 +92,10 @@ public class AuthenticationService {
      * @return токен
      */
     public JwtAuthenticationResponseDto signIn(SignInRequestDto request) {
+        String lowerCaseEmail = request.getEmail().toLowerCase();
+
         var user = userRepoService
-                .getUserByEmailForLogin(request.getEmail());
+                .getUserByEmailForLogin(lowerCaseEmail);
         if (!passwordService.isPasswordsEqual(request.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Invalid username or password");
         }
@@ -112,17 +116,19 @@ public class AuthenticationService {
 
     @Transactional
     public void resetPassword(ResetPasswordDto resetPasswordDto) {
-        User user = userRepoService.getUserByEmail(resetPasswordDto.getEmail());
+        String lowerCaseEmail = resetPasswordDto.getEmail().toLowerCase();
+
+        User user = userRepoService.getUserByEmail(lowerCaseEmail);
 
         boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
                 resetPasswordDto.getVerificationCode(),
-                resetPasswordDto.getEmail(),
+                lowerCaseEmail,
                 VerificationPurpose.PASSWORD_RESET.toString());
 
         if (isVerificationCodeValid) {
             String newEncodedPassword = passwordService.encodePassword(resetPasswordDto.getNewPassword());
             userRepoService.changePassword(user.getId(), newEncodedPassword);
-            verificationCodeService.useCode(resetPasswordDto.getVerificationCode(), resetPasswordDto.getEmail());
+            verificationCodeService.useCode(resetPasswordDto.getVerificationCode(), lowerCaseEmail);
         } else {
             throw new CodeNotFoundException("Неверный код подтверждения");
         }
@@ -130,21 +136,25 @@ public class AuthenticationService {
 
     @Transactional
     public void sendResetPasswordCode(String email) {
-        if (emailService.isEmailAlreadyExist(email)) {
+        String lowerCaseEmail = email.toLowerCase();
+
+        if (emailService.isEmailAlreadyExist(lowerCaseEmail)) {
             VerificationCode code = verificationCodeService.createVerificationCode(
-                    email,
+                    lowerCaseEmail,
                     VerificationPurpose.PASSWORD_RESET.toString());
-            mailService.sendResetPassword(email, code.getCode());
+            mailService.sendResetPassword(lowerCaseEmail, code.getCode());
         }
     }
 
     @Transactional
     public void sendRegistrationCode(String email) {
-        if (!emailService.isEmailAlreadyExist(email)) {
+        String lowerCaseEmail = email.toLowerCase();
+
+        if (!emailService.isEmailAlreadyExist(lowerCaseEmail)) {
             VerificationCode code = verificationCodeService.createVerificationCode(
-                    email,
+                    lowerCaseEmail,
                     VerificationPurpose.REGISTRATION.toString());
-            mailService.sendConfirmationEmail(email, code.getCode());
+            mailService.sendConfirmationEmail(lowerCaseEmail, code.getCode());
         }
     }
 }

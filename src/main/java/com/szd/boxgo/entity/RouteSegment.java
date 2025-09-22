@@ -20,7 +20,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode(of = {"id", "departureCity", "arrivalCity"})
 public class RouteSegment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

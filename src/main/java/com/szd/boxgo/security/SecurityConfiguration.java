@@ -63,6 +63,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/hi", "/listings", "/listings/get/**").permitAll()
                         .requestMatchers("/about-us/**", "support-service").permitAll()
                         .requestMatchers("/offer/**").permitAll()
+                        .requestMatchers("/websocket/**").permitAll()
                         .requestMatchers("/.well-known/apple-app-site-association").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())

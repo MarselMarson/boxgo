@@ -185,7 +185,9 @@ public class ListingService {
     }
 
     private void fillPackages(Set<Package> packages, List<NewPackageDto> newPackages, Listing listing) {
+        int order = 0;
         for (NewPackageDto dto : newPackages) {
+            order++;
             ParcelType parcelType = parcelTypeRepo.findById(dto.getParcelTypeId())
                             .orElseThrow(() -> new EntityNotFoundException("parcel type didn't found"));
             List<Category> categoriesFromDb = categoryRepo.findAllById(dto.getCategoryIds());
@@ -198,6 +200,7 @@ public class ListingService {
 
             //TODO validate size etc
             packages.add(Package.builder()
+                    .order(order)
                     .listing(listing)
                     .parcelType(parcelType)
                     .categories(categories)
@@ -212,8 +215,12 @@ public class ListingService {
     }
 
     public ListingDto getById(Long id) {
-        Listing listing = listingRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("no"));
+        Listing listing = findById(id);
         return listingMapper.toDto(listing);
+    }
+
+    public Listing findById(Long id) {
+        return listingRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Listing with id " + id + " doesn't exists"));
     }
 
     public Page<SegmentDto> getAll(Pageable pageable, ListingSegmentFilter filter) {

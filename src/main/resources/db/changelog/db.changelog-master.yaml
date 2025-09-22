@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/boxgo_V012__listings.sql
   - include:
       file: db/changelog/changeset/boxgo_V013__packages.sql
+  - include:
+      file: db/changelog/changeset/boxgo_V014__chat.sql

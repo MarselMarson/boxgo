@@ -4,12 +4,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import static java.lang.Thread.sleep;
 
-@Component
+//@Component
 public class AppDontSleepForRenderRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
