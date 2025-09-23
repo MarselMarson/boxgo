@@ -35,7 +35,7 @@ public interface ChatRepo extends JpaRepository<Chat, Long> {
                            @Param("lastMessageId") Long lastMessageId,
                            @Param("lastMessageCreatedAt") OffsetDateTime lastMessageCreatedAt,
                            @Param("lastMessageContent") String lastMessageContent,
-                           @Param("lastMessageSenderId") User lastMessageSender
+                           @Param("lastMessageSender") User lastMessageSender
     );
 
     @Query(
