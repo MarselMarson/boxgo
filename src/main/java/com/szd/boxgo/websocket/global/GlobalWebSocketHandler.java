@@ -27,16 +27,18 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
     private final List<MessageHandler> messageHandlers;
     private final WebSocketAuthenticator authenticator;
     private final MessagingService messagingService;
+    private final UserDataService userDataService;
 
     public GlobalWebSocketHandler(List<MessageHandler> messageHandlers,
                                   SessionRepository sessionRepository,
                                   SessionService sessionService,
                                   WebSocketAuthenticator authenticator,
-                                  MessagingService messagingService) {
+                                  MessagingService messagingService, UserDataService userDataService) {
         super(sessionRepository, sessionService);
         this.messageHandlers = messageHandlers;
         this.authenticator = authenticator;
         this.messagingService = messagingService;
+        this.userDataService = userDataService;
     }
 
     @Override
@@ -53,13 +55,14 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
 
     private void handleSuccessfulAuth(Long userId, WebSocketSession session) {
         sessionRepository.register(userId, session);
-        messagingService.handleSuccessConnection(session);
+        UserData userData = userDataService.generate(userId);
+        messagingService.handleSuccessConnection(session, userData);
         log.info("User {} connected to global websocket", userId);
     }
 
-    private void handleFailedAuth(WebSocketSession session, int code) {
+    private void handleFailedAuth(WebSocketSession session, int code, String message) {
         log.warn("Authentication to global websocket failed, session: {}", session.getId());
-        messagingService.handleFailureConnection(session, code);
+        messagingService.handleFailureConnection(session, code, message);
 
         sessionService.terminate(session);
     }
@@ -73,10 +76,10 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
             handleSuccessfulAuth(authenticator.authenticate(authHeader).getId(), session);
         } catch (AuthenticationException e) {
             log.warn("Authentication failed: {}", e.getMessage());
-            handleFailedAuth(session, WebsocketErrorCode.TOKEN_INVALID.getCode());
+            handleFailedAuth(session, WebsocketErrorCode.TOKEN_INVALID.getCode(), e.getMessage());
         } catch (EntityNotFoundException e) {
             log.warn("User auth failed: {}", e.getMessage());
-            handleFailedAuth(session, WebsocketErrorCode.USER_DELETED_OR_BANNED.getCode());
+            handleFailedAuth(session, WebsocketErrorCode.USER_DELETED_OR_BANNED.getCode(), e.getMessage());
         } catch (Exception e) {
             log.error("Error during WebSocket connection establishment: " + e.getMessage());
             try {

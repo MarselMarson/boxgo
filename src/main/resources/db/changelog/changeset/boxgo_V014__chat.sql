@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
         content varchar(4096) NOT NULL,
         status varchar(32) NOT NULL,
 
-        frontend_id bigint UNIQUE,
+        frontend_id UUID,
         version BIGINT NOT NULL DEFAULT 0,
 
         created_at timestamptz DEFAULT current_timestamp,
@@ -57,8 +57,15 @@ ALTER TABLE chats
     ADD CONSTRAINT fk_last_message_id FOREIGN KEY (last_message_id) REFERENCES chat_messages (id),
     ADD CONSTRAINT fk_last_message_sender_id FOREIGN KEY (last_message_sender_id) REFERENCES users (id);
 
-CREATE INDEX ON chats(user_id, last_message_created_at DESC);
-CREATE INDEX ON chats(user_id, segment_id);
-CREATE INDEX ON chats(listing_owner_id, last_message_created_at DESC);
-CREATE INDEX ON chats(listing_owner_id, user_id);
-CREATE INDEX ON chat_messages(chat_id, id DESC);
+CREATE INDEX IF NOT EXISTS idx_chats_user_id_last_message_date
+    ON chats(user_id, last_message_created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_chats_user_id_segment_id
+    ON chats(user_id, segment_id);
+CREATE INDEX IF NOT EXISTS idx_chats_listing_owner_id_last_message_date
+    ON chats(listing_owner_id, last_message_created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_chats_listing_owner_id_user_id
+    ON chats(listing_owner_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_chat_id_id
+    ON chat_messages(chat_id, id DESC);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_status_recipient_chat
+    ON chat_messages(chat_id, recipient_id, status);

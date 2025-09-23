@@ -20,4 +20,5 @@ public class ConnectionDto {
     int code;
     @Schema(description = "Сообщение")
     String message;
+    Long unreadChatsTotal;
 }

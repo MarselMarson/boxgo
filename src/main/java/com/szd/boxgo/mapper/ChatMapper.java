@@ -1,5 +1,6 @@
 package com.szd.boxgo.mapper;
 
+import com.szd.boxgo.dto.chat.ChatDto;
 import com.szd.boxgo.dto.chat.ChatInMessageDto;
 import com.szd.boxgo.entity.chat.Chat;
 import org.mapstruct.Mapper;
@@ -24,4 +25,20 @@ public interface ChatMapper {
     @Mapping(target = "unreadCount", source = "unreadMessagesCount")
     @Mapping(target = "version", source = "version")
     ChatInMessageDto toChatInMessageDto(Chat chat);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "listingId", source = "listing.id")
+    @Mapping(target = "segmentId", source = "segment.id")
+    @Mapping(target = "fromCity", source = "fromCity.id")
+    @Mapping(target = "toCity", source = "toCity.id")
+    @Mapping(target = "departureLocalAt", source = "departureLocalAt")
+    @Mapping(target = "arrivalLocalAt", source = "arrivalLocalAt")
+    @Mapping(target = "counterpart", ignore = true)
+    @Mapping(target = "lastMessageId", source = "lastMessage.id")
+    @Mapping(target = "lastMessageSenderId", source = "lastMessageSender.id")
+    @Mapping(target = "lastMessageContent", source = "lastMessageContent")
+    @Mapping(target = "lastMessageCreatedAt", source = "lastMessageCreatedAt")
+    @Mapping(target = "unreadCount", source = "unreadMessagesCount")
+    @Mapping(target = "version", source = "version")
+    ChatDto toChat(Chat chat);
 }
