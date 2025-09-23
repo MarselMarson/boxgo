@@ -20,7 +20,6 @@ class JwtWebSocketAuthenticator implements WebSocketAuthenticator {
     @Transactional(readOnly = true)
     public User authenticate(String jwtToken) throws AuthenticationException, EntityNotFoundException {
         try {
-
             if (jwtToken == null || jwtToken.trim().isEmpty()) {
                 throw new AuthenticationException("Token is missing");
             }
