@@ -18,10 +18,10 @@ import java.time.LocalDateTime;
 @Schema(description = "Сегмент")
 public class CreatedSegmentDto {
     CityDto fromCity;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime departureLocalAt;
     CityDto toCity;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime arrivalLocalAt;
     Boolean isActive;
 }

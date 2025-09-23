@@ -25,10 +25,10 @@ public class SegmentDto {
     Integer segmentsCount;
 
     CityDto fromCity;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime departureLocalAt;
     CityDto toCity;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime arrivalLocalAt;
 
     List<PackageDto> availablePackages;
