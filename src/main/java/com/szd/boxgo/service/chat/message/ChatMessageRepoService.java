@@ -1,9 +1,12 @@
 package com.szd.boxgo.service.chat.message;
 
+import com.szd.boxgo.dto.chat.ChatMessageDto;
 import com.szd.boxgo.entity.chat.ChatMessage;
 import com.szd.boxgo.repo.chat.ChatMessageRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +25,16 @@ public class ChatMessageRepoService {
     }
 
     @Transactional
-    public void setMessagesStatusToRead(Long chatId, Long chatPartnerId, Long lastMessageId) {
-        messageRepo.setMessagesStatusToRead(chatId, chatPartnerId, lastMessageId);
+    public void setMessagesStatusToRead(Long chatId, Long userId) {
+        messageRepo.setMessagesStatusToRead(chatId, userId);
     }
 
     @Transactional
-    public Integer findCountOfUnreadMessages(Long chatId, Long chatPartnerId) {
-        //return messageRepo.findCountOfUnreadMessages(chatId, chatPartnerId);
-        return 1;
+    public void setMessagesStatusToRead(Long chatId, Long userId, Long lastMessageId) {
+        messageRepo.setMessagesStatusToRead(chatId, userId, lastMessageId);
+    }
+
+    public Page<ChatMessageDto> getMessagesByChatId(Long chatId, Pageable pageable) {
+        return messageRepo.findAllByChatId(chatId, pageable);
     }
 }

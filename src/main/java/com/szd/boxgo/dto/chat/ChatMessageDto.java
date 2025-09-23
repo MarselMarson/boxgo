@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -17,7 +18,7 @@ import java.time.OffsetDateTime;
 @Schema(description = "Сообщение")
 public class ChatMessageDto {
     Long id;
-    Long clientMessageId;
+    UUID clientMessageId;
     Long senderId;
     String content;
     String status;

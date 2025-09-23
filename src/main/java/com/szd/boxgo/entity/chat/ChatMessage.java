@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "chat_messages")
@@ -41,7 +42,7 @@ public class ChatMessage {
     private String status;
 
     @Column(name = "frontend_id", unique = true)
-    private Long frontendId;
+    private UUID frontendId;
 
     @Version
     private Long version;

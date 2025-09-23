@@ -20,15 +20,22 @@ class JwtWebSocketAuthenticator implements WebSocketAuthenticator {
     @Transactional(readOnly = true)
     public User authenticate(String jwtToken) throws AuthenticationException, EntityNotFoundException {
         try {
+
             if (jwtToken == null || jwtToken.trim().isEmpty()) {
                 throw new AuthenticationException("Token is missing");
             }
 
-            if (!jwtService.isTokenNotExpired(jwtToken)) {
+            String jwtTokenWithoutBearer = jwtToken;
+            // Удаляем префикс "Bearer " если он присутствует
+            if (jwtToken.startsWith("Bearer ")) {
+                jwtTokenWithoutBearer = jwtToken.substring(7);
+            }
+
+            if (!jwtService.isTokenNotExpired(jwtTokenWithoutBearer)) {
                 throw new AuthenticationException("Token expired");
             }
 
-            String username = jwtService.extractUserName(jwtToken);
+            String username = jwtService.extractUserName(jwtTokenWithoutBearer);
 
             return userRepo.getUser(username)
                     .orElseThrow(() -> new EntityNotFoundException("User deleted or banned"));

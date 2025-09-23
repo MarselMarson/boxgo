@@ -51,7 +51,7 @@ public class ConfirmDeliveryMessageHandler implements MessageHandler {
 
             log.info("user: {} read msg {}", senderId, dto.getMessageId());
 
-            Chat chat = chatRepoService.getChatIdOrCreate(senderId, dto.getSegmentId());
+            Chat chat = chatRepoService.getChatIdOrCreate(dto.getInterlocutorId(), dto.getSegmentId());
             ChatMessage deliveredMessage = messageService
                     .setMessageStatusToRead(dto.getMessageId(), senderId, chat.getId());
             messagingService.confirmMessageDelivery(deliveredMessage);

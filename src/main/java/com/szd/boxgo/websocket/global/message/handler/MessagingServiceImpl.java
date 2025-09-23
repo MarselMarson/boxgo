@@ -7,6 +7,7 @@ import com.szd.boxgo.entity.chat.ChatMessage;
 import com.szd.boxgo.entity.chat.WebsocketMessageType;
 import com.szd.boxgo.service.chat.message.ChatMessageService;
 import com.szd.boxgo.websocket.global.TextMessageMapper;
+import com.szd.boxgo.websocket.global.UserData;
 import com.szd.boxgo.websocket.global.session.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +24,22 @@ public class MessagingServiceImpl implements MessagingService {
     private final SessionService sessionService;
 
     @Override
-    public void handleSuccessConnection(WebSocketSession session) {
+    public void handleSuccessConnection(WebSocketSession session, UserData userData) {
         ConnectionDto answer = ConnectionDto.builder()
                 .type(WebsocketMessageType.AUTH.getTitle())
                 .code(200)
+                .unreadChatsTotal(userData.getUnreadChatsCount())
                 .build();
 
         sessionService.sendAuthMessage(session, textMessageMapper.toTextMessage(answer));
     }
 
     @Override
-    public void handleFailureConnection(WebSocketSession session, int code) {
+    public void handleFailureConnection(WebSocketSession session, int code, String message) {
         ConnectionDto answer = ConnectionDto.builder()
                 .type(WebsocketMessageType.ERROR.getTitle())
                 .code(code)
+                .message(message)
                 .build();
 
         sessionService.sendAuthMessage(session, textMessageMapper.toTextMessage(answer));

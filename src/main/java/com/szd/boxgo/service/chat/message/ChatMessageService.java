@@ -10,7 +10,6 @@ import com.szd.boxgo.entity.chat.MessageStatus;
 import com.szd.boxgo.mapper.ChatMapper;
 import com.szd.boxgo.mapper.ChatMessageMapper;
 import com.szd.boxgo.mapper.UserMapper;
-import com.szd.boxgo.service.user.UserService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
-    private final UserService userService;
     private final UserMapper userMapper;
     private final ChatMapper chatMapper;
     private final ChatMessageMapper chatMessageMapper;
@@ -77,10 +75,5 @@ public class ChatMessageService {
         messageRepoService.setMessagesStatusToRead(chatId, senderId, messageId);
 
         return targetMessage;
-    }
-
-    @Transactional
-    public Integer getUnreadMessagesCount(Long chatId, Long chatPartnerId) {
-        return messageRepoService.findCountOfUnreadMessages(chatId, chatPartnerId);
     }
 }
