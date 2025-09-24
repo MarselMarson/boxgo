@@ -1,10 +1,6 @@
 package com.szd.boxgo.websocket.global.message.handler;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szd.boxgo.dto.chat.ReadMessageDto;
-import com.szd.boxgo.entity.chat.Chat;
-import com.szd.boxgo.entity.chat.ChatMessage;
 import com.szd.boxgo.entity.chat.WebsocketMessageType;
 import com.szd.boxgo.service.chat.ChatRepoService;
 import com.szd.boxgo.service.chat.message.ChatMessageService;
@@ -33,7 +29,7 @@ public class ConfirmDeliveryMessageHandler implements MessageHandler {
         try {
             var tree = objectMapper.readTree(message.getPayload());
             return tree.has("type")
-                   && tree.get("type").asText().equals(WebsocketMessageType.READ_MESSAGE.getTitle())
+                   && tree.get("type").asText().equals(WebsocketMessageType.DELIVER_MESSAGE.getTitle())
                    && tree.has("listingId")
                    && tree.has("segmentId")
                    && tree.has("interlocutorId")
@@ -46,19 +42,6 @@ public class ConfirmDeliveryMessageHandler implements MessageHandler {
     @Override
     @Transactional
     public void handle(WebSocketSession session, TextMessage message, Long senderId) {
-        try {
-            ReadMessageDto dto = objectMapper.readValue(message.getPayload(), ReadMessageDto.class);
-
-            log.info("user: {} read msg {}", senderId, dto.getMessageId());
-
-            Chat chat = chatRepoService.getChatIdOrCreate(dto.getInterlocutorId(), dto.getSegmentId());
-            ChatMessage deliveredMessage = messageService
-                    .setMessageStatusToRead(dto.getMessageId(), senderId, chat.getId());
-            messagingService.confirmMessageDelivery(deliveredMessage);
-
-            //eventPublisher.publishEvent(new UpdateUnreadChatsCountEvent(this, senderId, chatId));
-        } catch (JacksonException e) {
-            log.warn("Can't map message from user {} session {}: {}", senderId, session, e.getMessage());
-        }
+        //TODO
     }
 }

@@ -1,6 +1,7 @@
 package com.szd.boxgo.websocket.global;
 
 import com.szd.boxgo.service.chat.ChatRepoService;
+import com.szd.boxgo.service.chat.UnreadChatsCountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ public class UserDataService {
     private final ConcurrentMap<Long, UserData> userData = new ConcurrentHashMap<>();
 
     private final ChatRepoService chatRepoService;
+    private final UnreadChatsCountService unreadChatsCountService;
 
     @Transactional
     public UserData generate(Long userId) {
@@ -23,6 +25,7 @@ public class UserDataService {
             UserData data = UserData.builder()
                     .userId(userId)
                     .unreadChats(getUnreadChatsId(userId))
+                    .unreadChatsVersion(unreadChatsCountService.getUnreadChatsCountVersion(userId))
                     .build();
             this.userData.put(userId, data);
             return data;

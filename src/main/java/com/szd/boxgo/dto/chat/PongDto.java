@@ -13,4 +13,5 @@ import lombok.experimental.FieldDefaults;
 public class PongDto {
     @Schema(description = "тип сообщения")
     String type;
+    String ts;
 }

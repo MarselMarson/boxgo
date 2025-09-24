@@ -44,7 +44,7 @@ public class UserController {
         userService.changePassword(userId, dto);
     }
 
-    @Operation(summary = "Смена пароля")
+    @Operation(summary = "Удалить аккаунт")
     @DeleteMapping("/me")
     public void deleteAccount(@AuthUserId Long userId, @RequestBody PasswordDto dto) {
         userService.deactivate(userId, dto.getPassword());

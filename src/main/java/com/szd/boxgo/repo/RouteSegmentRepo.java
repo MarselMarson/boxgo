@@ -29,7 +29,7 @@ public interface RouteSegmentRepo extends JpaRepository<RouteSegment, Long>, Jpa
             LIMIT :batchSize
         )
         UPDATE route_segments rs
-        SET is_archived = true, archived_at = :currentTime
+        SET is_archived = true, archived_at = now()
         FROM expired_segments es
         WHERE rs.id = es.id
         """,

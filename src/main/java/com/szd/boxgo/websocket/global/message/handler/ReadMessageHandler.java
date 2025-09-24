@@ -2,10 +2,12 @@ package com.szd.boxgo.websocket.global.message.handler;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.szd.boxgo.dto.chat.PongDto;
+import com.szd.boxgo.dto.chat.ReadMessageDto;
+import com.szd.boxgo.entity.chat.Chat;
+import com.szd.boxgo.entity.chat.ChatMessage;
 import com.szd.boxgo.entity.chat.WebsocketMessageType;
-import com.szd.boxgo.exception.IdAlreadyExistsException;
-import com.szd.boxgo.service.chat.ChatService;
+import com.szd.boxgo.service.chat.ChatRepoService;
+import com.szd.boxgo.service.chat.message.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,9 +21,10 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PingMessageHandler implements MessageHandler {
+public class ReadMessageHandler implements MessageHandler {
     private final ObjectMapper objectMapper;
-    private final ChatService chatService;
+    private final ChatMessageService messageService;
+    private final ChatRepoService chatRepoService;
     private final ApplicationEventPublisher eventPublisher;
     private final MessagingService messagingService;
 
@@ -30,7 +33,11 @@ public class PingMessageHandler implements MessageHandler {
         try {
             var tree = objectMapper.readTree(message.getPayload());
             return tree.has("type")
-                   && tree.get("type").asText().equals(WebsocketMessageType.PING.getTitle());
+                   && tree.get("type").asText().equals(WebsocketMessageType.READ_MESSAGE.getTitle())
+                   && tree.has("listingId")
+                   && tree.has("segmentId")
+                   && tree.has("interlocutorId")
+                   && tree.has("messageId");
         } catch (IOException e) {
             return false;
         }
@@ -40,15 +47,16 @@ public class PingMessageHandler implements MessageHandler {
     @Transactional
     public void handle(WebSocketSession session, TextMessage message, Long senderId) {
         try {
-            PongDto ping = objectMapper.readValue(message.getPayload(), PongDto.class);
+            ReadMessageDto dto = objectMapper.readValue(message.getPayload(), ReadMessageDto.class);
 
-            log.info("user: {} ping", senderId);
-            try {
-                messagingService.handlePing(senderId, ping.getTs());
-                //eventPublisher.publishEvent(new NewMessageEvent(this, senderId, savedMessage.getId()));
-            } catch (IdAlreadyExistsException e) {
-                log.warn(e.getMessage());
-            }
+            log.info("user: {} read msg {}", senderId, dto.getMessageId());
+
+            Chat chat = chatRepoService.getChatIdOrCreate(dto.getInterlocutorId(), dto.getSegmentId());
+            ChatMessage deliveredMessage = messageService
+                    .setMessageStatusToRead(dto.getMessageId(), senderId, chat.getId());
+            messagingService.confirmMessageDelivery(deliveredMessage);
+
+            //eventPublisher.publishEvent(new UpdateUnreadChatsCountEvent(this, senderId, chatId));
         } catch (JacksonException e) {
             log.warn("Can't map message from user {} session {}: {}", senderId, session, e.getMessage());
         }

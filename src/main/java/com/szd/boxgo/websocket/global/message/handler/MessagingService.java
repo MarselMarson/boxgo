@@ -10,6 +10,6 @@ public interface MessagingService {
     void handleIncomingMessage(ChatMessage message);
     void handleChatReadEvent(ChatMessage message);
     void confirmMessageDelivery(ChatMessage message);
-    void handlePing(Long senderId);
+    void handlePing(Long senderId, String ts);
     void updateUnreadChatsCount(Long userId, Long unreadChatsCount);
 }

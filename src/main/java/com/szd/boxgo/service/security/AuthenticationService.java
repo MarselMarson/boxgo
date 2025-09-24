@@ -9,11 +9,12 @@ import com.szd.boxgo.dto.user.UserDto;
 import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.VerificationCode;
 import com.szd.boxgo.entity.VerificationPurpose;
+import com.szd.boxgo.entity.chat.UnreadChatsCountVersion;
 import com.szd.boxgo.exception.CodeNotFoundException;
 import com.szd.boxgo.mapper.UserMapper;
 import com.szd.boxgo.security.JwtService;
-import com.szd.boxgo.service.user.UserManagementService;
 import com.szd.boxgo.service.VerificationCodeService;
+import com.szd.boxgo.service.user.UserManagementService;
 import com.szd.boxgo.service.user.UserRepoService;
 import com.szd.boxgo.service.user.email.EmailService;
 import com.szd.boxgo.service.user.email.MailService;
@@ -72,6 +73,12 @@ public class AuthenticationService {
 
             String jwt = jwtService.generateToken(createdUser);
             Date jwtExpiration = jwtService.getExpiration(jwt);
+
+            UnreadChatsCountVersion unreadChatsCountVersion = UnreadChatsCountVersion.builder()
+                    .user(createdUser)
+                    .build();
+
+
 
             return new JwtAuthenticationResponseDto(
                     jwt,

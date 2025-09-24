@@ -29,6 +29,7 @@ public class MessagingServiceImpl implements MessagingService {
                 .type(WebsocketMessageType.AUTH.getTitle())
                 .code(200)
                 .unreadChatsTotal(userData.getUnreadChatsCount())
+                .unreadChatsTotal(userData.getUnreadChatsVersion())
                 .build();
 
         sessionService.sendAuthMessage(session, textMessageMapper.toTextMessage(answer));
@@ -73,8 +74,9 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public void handlePing(Long senderId) {
-        TextMessage textMessage = textMessageMapper.toTextMessage(new PongDto(WebsocketMessageType.PING.getTitle()));
+    public void handlePing(Long senderId, String ts) {
+        TextMessage textMessage = textMessageMapper.toTextMessage(
+                new PongDto(WebsocketMessageType.PONG.getTitle(), ts));
         sessionService.sendMessage(senderId, textMessage);
     }
 

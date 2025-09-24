@@ -12,6 +12,7 @@ public enum WebsocketMessageType {
     UNREAD_TOTAL("chat.unread_total"),
     ERROR("chat.error"),
     READ_MESSAGE("chat.messageRead"),
+    DELIVER_MESSAGE("chat.messageReceived"),
 
     PING("ping"),
     PONG("pong");

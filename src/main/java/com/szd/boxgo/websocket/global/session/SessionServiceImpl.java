@@ -1,5 +1,6 @@
 package com.szd.boxgo.websocket.global.session;
 
+import com.szd.boxgo.websocket.global.UserDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService {
     private final SessionRepository sessionRepository;
+    private final UserDataService userDataService;
 
     @Override
     public void terminate(WebSocketSession session) {
@@ -27,6 +29,15 @@ public class SessionServiceImpl implements SessionService {
 
         Long userId = sessionRepository.getUserId(session).orElse(null);
         sessionRepository.remove(session);
+
+        if (userId != null) {
+            var sessions = sessionRepository.getSessions(userId);
+
+            if (sessions.isEmpty()) {
+                userDataService.clear(userId);
+                log.info("The user {} no longer has any open sessions left. Data cleared", userId);
+            }
+        }
     }
 
     @Override
@@ -43,6 +54,9 @@ public class SessionServiceImpl implements SessionService {
                 log.error("Error closing session {}: {}", session.getId(), e.getMessage());
             }
         });
+
+        userDataService.clear(userId);
+        log.info("All {} sessions terminated for user {}. Data cleared", sessions.size(), userId);
     }
 
     @Override
