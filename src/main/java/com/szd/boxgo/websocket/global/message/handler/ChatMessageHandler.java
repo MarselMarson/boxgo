@@ -52,7 +52,6 @@ public class ChatMessageHandler implements MessageHandler {
             try {
                 ChatMessage savedMessage = chatService.createMessage(newMessageDto, senderId);
                 messagingService.handleIncomingMessage(savedMessage);
-                //eventPublisher.publishEvent(new NewMessageEvent(this, senderId, savedMessage.getId()));
             } catch (IdAlreadyExistsException e) {
                 log.warn(e.getMessage());
             }

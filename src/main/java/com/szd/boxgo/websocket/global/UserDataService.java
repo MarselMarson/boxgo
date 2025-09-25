@@ -25,7 +25,6 @@ public class UserDataService {
             UserData data = UserData.builder()
                     .userId(userId)
                     .unreadChats(getUnreadChatsId(userId))
-                    .unreadChatsVersion(unreadChatsCountService.getUnreadChatsCountVersion(userId))
                     .build();
             this.userData.put(userId, data);
             return data;
@@ -36,6 +35,10 @@ public class UserDataService {
     private Set<Long> getUnreadChatsId(Long userId) {
         return chatRepoService.findUnreadChatsIdByUserId(userId).stream()
                 .collect(Collectors.toCollection(ConcurrentHashMap::newKeySet));
+    }
+
+    public Long incrementAndGetUnreadChatsCountVersion(Long userId) {
+        return unreadChatsCountService.incrementAndGetUnreadChatsCountVersion(userId);
     }
 
     public void clear(Long userId) {

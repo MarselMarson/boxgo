@@ -7,7 +7,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -17,20 +16,16 @@ import java.time.OffsetDateTime;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Schema(description = "Чат")
 public class ChatInMessageDto {
-    Long listingId;
     Long segmentId;
+    Long clientId;
+    Long listingId;
+
     Long fromCity;
     Long toCity;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime departureLocalAt;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime arrivalLocalAt;
-
-    Long lastMessageId;
-    Long lastMessageSenderId;
-    String lastMessageContent;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    OffsetDateTime lastMessageCreatedAt;
 
     Long unreadCount;
     Long version;

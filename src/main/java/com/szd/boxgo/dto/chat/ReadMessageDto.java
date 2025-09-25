@@ -1,6 +1,7 @@
 package com.szd.boxgo.dto.chat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,12 +16,13 @@ import lombok.experimental.FieldDefaults;
 public class ReadMessageDto {
     @Schema(description = "тип сообщения")
     String type;
-    @Schema(description = "id объявления")
-    Long listingId;
     @Schema(description = "id отрезка")
     Long segmentId;
     @Schema(description = "id собеседника")
+    @JsonProperty("clientId")
     Long interlocutorId;
+    @Schema(description = "id объявления")
+    Long listingId;
     @Schema(description = "id сообщения")
     Long messageId;
 }

@@ -51,4 +51,9 @@ public interface ChatMessageRepo extends JpaRepository<ChatMessage, Long>, JpaSp
     """)
     Page<ChatMessageDto> findAllByChatId(@Param("chatId") Long chatId, Pageable pageable);
 
+    @Query("""
+        SELECT count(cm) FROM ChatMessage cm
+        WHERE cm.chat.id = :chatId AND cm.status = 'SENT' AND cm.sender.id = :chatPartnerId
+    """)
+    Integer findCountOfUnreadMessages(Long chatId, Long chatPartnerId);
 }

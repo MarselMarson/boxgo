@@ -45,18 +45,23 @@ public class ChatMessageService {
         return messageRepoService.saveMessage(message);
     }
 
-    public ChatInMessageDto getChatInMessageDto(Chat chat) {
-        return chatMapper.toChatInMessageDto(chat);
-    }
+    @Transactional
+    public SendingMessageDto getSendingMessageDto(ChatMessage message, User interlocutor,
+                                                  Long unreadChatsCount, Long unreadChatsVersion) {
+        ChatInMessageDto dto = chatMapper.toChatInMessageDto(message.getChat());
 
-    public SendingMessageDto getSendingMessageDto(ChatMessage message, User interlocutor) {
+        dto.setUnreadCount(
+                message.getSender().getId().equals(interlocutor.getId())
+                        ? message.getChat().getUnreadMessagesCount() : 0L
+        );
+
         return SendingMessageDto.builder()
                 .type("chat.message")
                 .interlocutor(userMapper.toDto(interlocutor))
-                .chat(getChatInMessageDto(message.getChat()))
+                .chat(dto)
                 .message(chatMessageMapper.toDto(message))
-                .unreadChatsTotal(0)
-                .unreadChatsVersion(1)
+                .unreadChatsTotal(unreadChatsCount)
+                .unreadChatsVersion(unreadChatsVersion)
                 .build();
     }
 

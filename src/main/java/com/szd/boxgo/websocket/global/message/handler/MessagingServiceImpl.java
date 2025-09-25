@@ -2,12 +2,15 @@ package com.szd.boxgo.websocket.global.message.handler;
 
 import com.szd.boxgo.dto.chat.PongDto;
 import com.szd.boxgo.dto.chat.SendingMessageDto;
+import com.szd.boxgo.dto.chat.UnreadChatsDto;
 import com.szd.boxgo.dto.websocket.global.ConnectionDto;
+import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.chat.ChatMessage;
 import com.szd.boxgo.entity.chat.WebsocketMessageType;
 import com.szd.boxgo.service.chat.message.ChatMessageService;
 import com.szd.boxgo.websocket.global.TextMessageMapper;
 import com.szd.boxgo.websocket.global.UserData;
+import com.szd.boxgo.websocket.global.UserDataService;
 import com.szd.boxgo.websocket.global.session.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChatMessageService messageService;
     private final TextMessageMapper textMessageMapper;
     private final SessionService sessionService;
+    private final UserDataService userDataService;
 
     @Override
     public void handleSuccessConnection(WebSocketSession session, UserData userData) {
@@ -29,7 +33,7 @@ public class MessagingServiceImpl implements MessagingService {
                 .type(WebsocketMessageType.AUTH.getTitle())
                 .code(200)
                 .unreadChatsTotal(userData.getUnreadChatsCount())
-                .unreadChatsTotal(userData.getUnreadChatsVersion())
+                .unreadChatsVersion(userDataService.incrementAndGetUnreadChatsCountVersion(userData.getUserId()))
                 .build();
 
         sessionService.sendAuthMessage(session, textMessageMapper.toTextMessage(answer));
@@ -48,13 +52,16 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public void handleIncomingMessage(ChatMessage message) {
-        sendMessage(message);
+        Long unreadChatsCount = userDataService.addUnreadChatAndGetCount(message.getRecipient().getId(), message.getChat().getId());
+        Long unreadChatsVersion = userDataService.incrementAndGetUnreadChatsCountVersion(message.getRecipient().getId());
+
+        sendMessage(message, message.getRecipient(), unreadChatsCount, unreadChatsVersion);
         log.info("user {} sent msg {} to user {}",
                 message.getSender().getId(),
                 message.getId(),
                 message.getRecipient().getId());
 
-        returnMessage(message);
+        returnMessage(message, message.getSender(), 0L, 0L);
         log.info("msg {} to user {}",
                 message.getId(),
                 message.getSender().getId());
@@ -62,12 +69,15 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public void handleChatReadEvent(ChatMessage message) {
-        sendMessage(message);
+        Long unreadChatsCount = userDataService.removeUnreadChatAndGetCount(message.getRecipient().getId(), message.getChat().getId());
+        Long unreadChatsVersion = userDataService.incrementAndGetUnreadChatsCountVersion(message.getRecipient().getId());
+
+        sendMessage(message, message.getSender(), 0L, 0L);
         log.info("resending updated chat info with user {} to user {}",
                 message.getSender().getId(),
                 message.getRecipient().getId());
 
-        returnMessage(message);
+        returnMessage(message, message.getRecipient(), unreadChatsCount, unreadChatsVersion);
         log.info("resending updated chat info with user {} to user {}",
                 message.getRecipient().getId(),
                 message.getSender().getId());
@@ -82,40 +92,46 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public void confirmMessageDelivery(ChatMessage message) {
+        /*Long unreadChatsCount = userDataService.addUnreadChatAndGetCount(message.getRecipient().getId(), message.getChat().getId());
+        Long unreadChatsVersion = userDataService.incrementAndGetUnreadChatsCountVersion(message.getRecipient().getId());
+
         try {
-            sendMessage(message);
+            sendMessage(message, message.getRecipient());
             log.info("The message {} read by the recipient {} was returned to the recipient",
                     message.getId(),
                     message.getRecipient().getId());
-            returnMessage(message);
 
+            returnMessage(message, message.getSender());
             log.info("The message {} read by the recipient {} was returned to the sender {}",
                     message.getId(),
                     message.getRecipient().getId(),
                     message.getSender().getId());
         } catch (RuntimeException e) {
             log.warn(e.getMessage());
-        }
+        }*/
     }
 
-    public void sendMessage(ChatMessage message) {
-        SendingMessageDto sendingMessageDto = messageService.getSendingMessageDto(message, message.getRecipient());
+    public void sendMessage(ChatMessage message, User recipient, Long unreadChatsCount, Long unreadChatsVersion) {
+        SendingMessageDto sendingMessageDto = messageService.getSendingMessageDto(
+                message, recipient, unreadChatsCount, unreadChatsVersion);
         TextMessage textMessage = textMessageMapper.toTextMessage(sendingMessageDto);
         sessionService.sendMessage(message.getRecipient().getId(), textMessage);
     }
 
-    public void returnMessage(ChatMessage message) {
-        SendingMessageDto sendingMessageDto = messageService.getSendingMessageDto(message, message.getSender());
+    public void returnMessage(ChatMessage message, User sender, Long unreadChatsCount, Long unreadChatsVersion) {
+        SendingMessageDto sendingMessageDto = messageService.getSendingMessageDto(
+                message, sender, unreadChatsCount, unreadChatsVersion);
         TextMessage textMessage = textMessageMapper.toTextMessage(sendingMessageDto);
         sessionService.sendMessage(message.getSender().getId(), textMessage);
     }
 
-    public void updateUnreadChatsCount(Long userId, Long unreadChatsCount) {
-        /*GlobalWebSocketNotificationDto notification = GlobalWebSocketNotificationDto.builder()
-                .type(MessageType.chat.name())
-                .countChats(unreadChatsCount)
+    public void updateUnreadChatsCount(Long userId, Long unreadChatsCount, Long unreadChatsCountVersion) {
+        UnreadChatsDto notification = UnreadChatsDto.builder()
+                .type(WebsocketMessageType.UNREAD_TOTAL.name())
+                .unreadChatsTotal(unreadChatsCount)
+                .unreadChatsVersion(unreadChatsCountVersion)
                 .build();
         TextMessage textMessage = textMessageMapper.toTextMessage(notification);
-        sessionService.sendMessage(userId, textMessage);*/
+        sessionService.sendMessage(userId, textMessage);
     }
 }

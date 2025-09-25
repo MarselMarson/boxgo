@@ -3,6 +3,7 @@ package com.szd.boxgo.websocket.global.message.handler;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.szd.boxgo.dto.chat.ReadMessageDto;
+import com.szd.boxgo.dto.notification.UpdateUnreadChatsCountEvent;
 import com.szd.boxgo.entity.chat.Chat;
 import com.szd.boxgo.entity.chat.ChatMessage;
 import com.szd.boxgo.entity.chat.WebsocketMessageType;
@@ -52,11 +53,11 @@ public class ReadMessageHandler implements MessageHandler {
             log.info("user: {} read msg {}", senderId, dto.getMessageId());
 
             Chat chat = chatRepoService.getChatIdOrCreate(dto.getInterlocutorId(), dto.getSegmentId());
-            ChatMessage deliveredMessage = messageService
+            ChatMessage readMessage = messageService
                     .setMessageStatusToRead(dto.getMessageId(), senderId, chat.getId());
-            messagingService.confirmMessageDelivery(deliveredMessage);
+            messagingService.handleChatReadEvent(readMessage);
 
-            //eventPublisher.publishEvent(new UpdateUnreadChatsCountEvent(this, senderId, chatId));
+            eventPublisher.publishEvent(new UpdateUnreadChatsCountEvent(this, senderId, chat.getId()));
         } catch (JacksonException e) {
             log.warn("Can't map message from user {} session {}: {}", senderId, session, e.getMessage());
         }

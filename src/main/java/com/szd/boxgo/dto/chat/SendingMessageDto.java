@@ -16,9 +16,9 @@ import lombok.experimental.FieldDefaults;
 @Schema(description = "Отправляемое сообщение в чат")
 public class SendingMessageDto {
     @JsonProperty("type")
-    private String type = "chat.message";
+    private String type;
 
-    @JsonProperty("interlocutor")
+    @JsonProperty("companion")
     private UserDto interlocutor;
 
     @JsonProperty("chat")
@@ -28,8 +28,8 @@ public class SendingMessageDto {
     private ChatMessageDto message;
 
     @JsonProperty("unreadChatsTotal")
-    private Integer unreadChatsTotal;
+    private Long unreadChatsTotal;
 
     @JsonProperty("unreadChatsVersion")
-    private Integer unreadChatsVersion;
+    private Long unreadChatsVersion;
 }

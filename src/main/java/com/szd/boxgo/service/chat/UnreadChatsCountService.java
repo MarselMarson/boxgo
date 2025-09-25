@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class UnreadChatsCountService {
     private final UnreadChatsCountVersionRepo repo;
 
-    public Long getUnreadChatsCountVersion(Long userId) {
-        return repo.findByUserId(userId).getVersion();
+    public Long incrementAndGetUnreadChatsCountVersion(Long userId) {
+        return repo.incrementAndGetVersion(userId);
     }
 }

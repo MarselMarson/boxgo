@@ -9,13 +9,11 @@ import org.springframework.context.ApplicationEvent;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatReadEvent extends ApplicationEvent {
     final Long readerId;
-    final Long chatPartnerId;
     final Long chatId;
 
-    public ChatReadEvent(Object source, Long readerId, Long chatPartnerId, Long chatId) {
+    public ChatReadEvent(Object source, Long readerId, Long chatId) {
         super(source);
         this.readerId = readerId;
-        this.chatPartnerId = chatPartnerId;
         this.chatId = chatId;
     }
 }

@@ -14,7 +14,6 @@ import java.util.Set;
 public class UserData {
     Long userId;
     Set<Long> unreadChats;
-    Long unreadChatsVersion;
 
     public long getUnreadChatsCount() {
         return this.unreadChats.size();

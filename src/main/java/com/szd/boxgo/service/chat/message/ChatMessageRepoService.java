@@ -37,4 +37,9 @@ public class ChatMessageRepoService {
     public Page<ChatMessageDto> getMessagesByChatId(Long chatId, Pageable pageable) {
         return messageRepo.findAllByChatId(chatId, pageable);
     }
+
+    @Transactional
+    public Integer findCountOfUnreadMessages(Long chatId, Long chatPartnerId) {
+        return messageRepo.findCountOfUnreadMessages(chatId, chatPartnerId);
+    }
 }
