@@ -43,6 +43,9 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
 
     @Override
     protected void handleTextMessage(@NonNull WebSocketSession session, @NotNull TextMessage message) {
+        String payload = message.getPayload();
+        log.info("Received WebSocket message - Session: {}, Payload: {}", session.getId(), payload);
+
         if (isAuthenticated(session)) {
             Long authenticatedUserId = sessionRepository.getUserId(session).orElse(null);
             if (authenticatedUserId == null) {
