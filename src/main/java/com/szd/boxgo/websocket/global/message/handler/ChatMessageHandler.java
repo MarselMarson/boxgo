@@ -34,7 +34,7 @@ public class ChatMessageHandler implements MessageHandler {
                    && tree.get("type").asText().equals(WebsocketMessageType.INCOMING_MESSAGE.getTitle())
                    && tree.has("listingId")
                    && tree.has("segmentId")
-                   && tree.has("interlocutorId")
+                   && tree.has("clientId")
                    && tree.has("content")
                    && tree.has("clientMessageId");
         } catch (IOException e) {

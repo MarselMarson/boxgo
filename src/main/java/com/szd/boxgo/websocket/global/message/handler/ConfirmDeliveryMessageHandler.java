@@ -32,7 +32,7 @@ public class ConfirmDeliveryMessageHandler implements MessageHandler {
                    && tree.get("type").asText().equals(WebsocketMessageType.DELIVER_MESSAGE.getTitle())
                    && tree.has("listingId")
                    && tree.has("segmentId")
-                   && tree.has("interlocutorId")
+                   && tree.has("clientId")
                    && tree.has("messageId");
         } catch (IOException e) {
             return false;

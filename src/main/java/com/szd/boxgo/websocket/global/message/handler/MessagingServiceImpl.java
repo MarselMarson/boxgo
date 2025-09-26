@@ -55,13 +55,13 @@ public class MessagingServiceImpl implements MessagingService {
         Long unreadChatsCount = userDataService.addUnreadChatAndGetCount(message.getRecipient().getId(), message.getChat().getId());
         Long unreadChatsVersion = userDataService.incrementAndGetUnreadChatsCountVersion(message.getRecipient().getId());
 
-        sendMessage(message, message.getRecipient(), unreadChatsCount, unreadChatsVersion);
+        sendMessage(message, message.getRecipient(), message.getSender(), unreadChatsCount, unreadChatsVersion);
         log.info("user {} sent msg {} to user {}",
                 message.getSender().getId(),
                 message.getId(),
                 message.getRecipient().getId());
 
-        returnMessage(message, message.getSender(), 0L, 0L);
+        returnMessage(message, message.getSender(), message.getRecipient(), 0L, 0L);
         log.info("msg {} to user {}",
                 message.getId(),
                 message.getSender().getId());
@@ -72,12 +72,12 @@ public class MessagingServiceImpl implements MessagingService {
         Long unreadChatsCount = userDataService.removeUnreadChatAndGetCount(message.getRecipient().getId(), message.getChat().getId());
         Long unreadChatsVersion = userDataService.incrementAndGetUnreadChatsCountVersion(message.getRecipient().getId());
 
-        sendMessage(message, message.getSender(), 0L, 0L);
+        sendMessage(message, message.getSender(), message.getRecipient(), 0L, 0L);
         log.info("resending updated chat info with user {} to user {}",
                 message.getSender().getId(),
                 message.getRecipient().getId());
 
-        returnMessage(message, message.getRecipient(), unreadChatsCount, unreadChatsVersion);
+        returnMessage(message, message.getRecipient(), message.getSender(), unreadChatsCount, unreadChatsVersion);
         log.info("resending updated chat info with user {} to user {}",
                 message.getRecipient().getId(),
                 message.getSender().getId());
@@ -111,18 +111,18 @@ public class MessagingServiceImpl implements MessagingService {
         }*/
     }
 
-    public void sendMessage(ChatMessage message, User recipient, Long unreadChatsCount, Long unreadChatsVersion) {
+    public void sendMessage(ChatMessage message, User recipient, User companion, Long unreadChatsCount, Long unreadChatsVersion) {
         SendingMessageDto sendingMessageDto = messageService.getSendingMessageDto(
-                message, recipient, unreadChatsCount, unreadChatsVersion);
+                message, companion, unreadChatsCount, unreadChatsVersion);
         TextMessage textMessage = textMessageMapper.toTextMessage(sendingMessageDto);
-        sessionService.sendMessage(message.getRecipient().getId(), textMessage);
+        sessionService.sendMessage(recipient.getId(), textMessage);
     }
 
-    public void returnMessage(ChatMessage message, User sender, Long unreadChatsCount, Long unreadChatsVersion) {
+    public void returnMessage(ChatMessage message, User sender, User companion, Long unreadChatsCount, Long unreadChatsVersion) {
         SendingMessageDto sendingMessageDto = messageService.getSendingMessageDto(
-                message, sender, unreadChatsCount, unreadChatsVersion);
+                message, companion, unreadChatsCount, unreadChatsVersion);
         TextMessage textMessage = textMessageMapper.toTextMessage(sendingMessageDto);
-        sessionService.sendMessage(message.getSender().getId(), textMessage);
+        sessionService.sendMessage(sender.getId(), textMessage);
     }
 
     public void updateUnreadChatsCount(Long userId, Long unreadChatsCount, Long unreadChatsCountVersion) {

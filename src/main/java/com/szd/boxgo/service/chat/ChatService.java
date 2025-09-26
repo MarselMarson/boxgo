@@ -46,7 +46,6 @@ public class ChatService {
 
         ChatMessage chatMessage = messageService.saveMessage(newMessageDto, chat, senderId);
 
-
         setChatLastMessage(chatMessage);
 
         return chatMessage;

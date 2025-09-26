@@ -46,18 +46,18 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public SendingMessageDto getSendingMessageDto(ChatMessage message, User interlocutor,
+    public SendingMessageDto getSendingMessageDto(ChatMessage message, User companion,
                                                   Long unreadChatsCount, Long unreadChatsVersion) {
         ChatInMessageDto dto = chatMapper.toChatInMessageDto(message.getChat());
 
         dto.setUnreadCount(
-                message.getSender().getId().equals(interlocutor.getId())
+                message.getSender().getId().equals(companion.getId())
                         ? message.getChat().getUnreadMessagesCount() : 0L
         );
 
         return SendingMessageDto.builder()
                 .type("chat.message")
-                .interlocutor(userMapper.toDto(interlocutor))
+                .interlocutor(userMapper.toDto(companion))
                 .chat(dto)
                 .message(chatMessageMapper.toDto(message))
                 .unreadChatsTotal(unreadChatsCount)

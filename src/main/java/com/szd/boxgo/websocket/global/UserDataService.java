@@ -65,11 +65,7 @@ public class UserDataService {
      */
     public long addUnreadChatAndGetCount(Long userId, Long chatId) {
         var data = userData.get(userId);
-        if (data != null) {
-            if (data.getUnreadChats().add(chatId)) {
-                return data.getUnreadChatsCount();
-            }
-        }
-        return -1L;
+        data.getUnreadChats().add(chatId);
+        return data.getUnreadChatsCount();
     }
 }

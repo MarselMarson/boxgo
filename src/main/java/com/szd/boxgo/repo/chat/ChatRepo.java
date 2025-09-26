@@ -24,11 +24,11 @@ public interface ChatRepo extends JpaRepository<Chat, Long> {
     @Query(
             """
                 UPDATE Chat c SET c.lastMessage.id = :lastMessageId,
-                c.lastMessageCreatedAt = :lastMessageCreatedAt,
-                c.lastMessageContent = :lastMessageContent,
-                c.lastMessageSender = :lastMessageSender,
-                c.unreadMessagesCount = (SELECT count(cm) FROM ChatMessage cm
-                    WHERE cm.chat.id = :chatId AND cm.status = 'SENT' AND cm.sender = :lastMessageSender)
+                    c.lastMessageCreatedAt = :lastMessageCreatedAt,
+                    c.lastMessageContent = :lastMessageContent,
+                    c.lastMessageSender = :lastMessageSender,
+                    c.unreadMessagesCount = (SELECT count(cm) FROM ChatMessage cm
+                        WHERE cm.chat.id = :chatId AND cm.status = 'SENT' AND cm.sender = :lastMessageSender)
                 WHERE c.id = :chatId
                     AND (c.lastMessage.id IS NULL
                         OR c.lastMessage.id < :lastMessageId)
