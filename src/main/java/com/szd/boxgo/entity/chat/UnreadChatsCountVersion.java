@@ -26,4 +26,8 @@ public class UnreadChatsCountVersion {
     @Column(name = "version")
     @Builder.Default
     private Long version = 0L;
+
+    @Version
+    @Column(name = "entity_version")
+    private Long entityVersion;
 }

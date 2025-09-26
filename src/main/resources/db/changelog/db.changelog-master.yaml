@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/changeset/boxgo_V014__chat.sql
   - include:
       file: db/changelog/changeset/boxgo_V015__unread_chats_count_version.sql
+  - include:
+      file: db/changelog/changeset/boxgo_V016__unread_chats_count_version.sql

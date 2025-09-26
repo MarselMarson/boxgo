@@ -11,7 +11,9 @@ import org.springframework.stereotype.Repository;
 public interface UnreadChatsCountVersionRepo extends JpaRepository<UnreadChatsCountVersion, Long> {
 
     @Modifying
-    @Query(value = "UPDATE unread_chats_count_version SET version = version + 1 WHERE user_id = :userId RETURNING version",
-            nativeQuery = true)
-    int incrementAndGetVersion(@Param("userId") Long userId);
+    @Query("UPDATE UnreadChatsCountVersion u SET u.version = u.version + 1 WHERE u.userId = :userId")
+    void incrementVersion(@Param("userId") Long userId);
+
+    @Query("SELECT u.version FROM UnreadChatsCountVersion u WHERE u.userId = :userId")
+    int findVersionByUserId(@Param("userId") Long userId);
 }
