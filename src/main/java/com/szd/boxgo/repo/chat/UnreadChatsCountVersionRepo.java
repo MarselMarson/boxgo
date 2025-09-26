@@ -13,5 +13,5 @@ public interface UnreadChatsCountVersionRepo extends JpaRepository<UnreadChatsCo
     @Modifying
     @Query(value = "UPDATE unread_chats_count_version SET version = version + 1 WHERE user_id = :userId RETURNING version",
             nativeQuery = true)
-    Long incrementAndGetVersion(@Param("userId") Long userId);
+    int incrementAndGetVersion(@Param("userId") Long userId);
 }

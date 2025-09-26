@@ -38,7 +38,7 @@ public class UserDataService {
     }
 
     public Long incrementAndGetUnreadChatsCountVersion(Long userId) {
-        return unreadChatsCountService.incrementAndGetUnreadChatsCountVersion(userId);
+        return (long) unreadChatsCountService.incrementAndGetUnreadChatsCountVersion(userId);
     }
 
     public void clear(Long userId) {
