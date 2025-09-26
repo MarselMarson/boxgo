@@ -58,6 +58,7 @@ public class ChatService {
     @Transactional
     public Page<ChatMessageDto> openChat(Long userId, Long segmentId, Long interlocutorId, Pageable pageable) {
         Chat chat = chatRepoService.getChatIdOrCreate(interlocutorId, segmentId);
+        chat.setUnreadMessagesCount(0L);
 
         messageRepoService.setMessagesStatusToRead(chat.getId(), userId);
         eventPublisher.publishEvent(new ChatReadEvent(this, userId, chat.getId()));

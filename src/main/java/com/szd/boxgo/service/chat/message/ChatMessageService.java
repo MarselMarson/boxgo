@@ -76,7 +76,6 @@ public class ChatMessageService {
         }
 
         targetMessage.setStatus(MessageStatus.READ.toString());
-
         messageRepoService.setMessagesStatusToRead(chatId, senderId, messageId);
 
         return targetMessage;

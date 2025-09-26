@@ -53,6 +53,8 @@ public class ReadMessageHandler implements MessageHandler {
             log.info("user: {} read msg {}", senderId, dto.getMessageId());
 
             Chat chat = chatRepoService.getChatIdOrCreate(dto.getInterlocutorId(), dto.getSegmentId());
+            chat.setUnreadMessagesCount(0L);
+
             ChatMessage readMessage = messageService
                     .setMessageStatusToRead(dto.getMessageId(), senderId, chat.getId());
             messagingService.handleChatReadEvent(readMessage);

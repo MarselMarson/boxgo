@@ -17,7 +17,8 @@ public interface ChatMessageRepo extends JpaRepository<ChatMessage, Long>, JpaSp
     @Query("""
         UPDATE ChatMessage cm
         SET cm.status = 'READ',
-            cm.updatedAt = CURRENT_TIMESTAMP
+            cm.updatedAt = CURRENT_TIMESTAMP,
+            cm.version = cm.version + 1
         WHERE cm.chat.id = :chatId
                 AND cm.status = 'SENT'
                 AND cm.recipient.id = :recipientId
@@ -28,7 +29,8 @@ public interface ChatMessageRepo extends JpaRepository<ChatMessage, Long>, JpaSp
     @Query("""
         UPDATE ChatMessage cm
         SET cm.status = 'READ',
-            cm.updatedAt = CURRENT_TIMESTAMP
+            cm.updatedAt = CURRENT_TIMESTAMP,
+            cm.version = cm.version + 1
         WHERE cm.chat.id = :chatId
                AND cm.recipient.id = :recipientId
                AND cm.id <= :lastMessageId
