@@ -13,6 +13,7 @@ public interface ChatMapper {
 
     @Mapping(target = "listingId", source = "listing.id")
     @Mapping(target = "segmentId", source = "segment.id")
+    @Mapping(target = "clientId", source = "user.id")
     @Mapping(target = "fromCity", source = "fromCity.id")
     @Mapping(target = "toCity", source = "toCity.id")
     @Mapping(target = "departureLocalAt", source = "departureLocalAt")
