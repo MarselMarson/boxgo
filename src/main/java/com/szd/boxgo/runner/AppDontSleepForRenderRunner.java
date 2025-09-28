@@ -17,9 +17,11 @@ public class AppDontSleepForRenderRunner implements CommandLineRunner {
         while (true) {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
+            headers.set("X-App-Version", "999.999.999");
 
             HttpEntity<?> entity = new HttpEntity<>(headers);
-            restTemplate.exchange("https://gobox.onrender.com/hi",  HttpMethod.GET, entity, String.class);
+            restTemplate.exchange("https://gobox.onrender.com/hi", HttpMethod.GET, entity, String.class);
+
             try {
                 sleep(25_000);
             } catch (InterruptedException e) {

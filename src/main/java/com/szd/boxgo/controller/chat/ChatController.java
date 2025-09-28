@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
     private final ChatService chatService;
 
-    @GetMapping("/{segmentId}/{interlocutorId}")
+    @GetMapping("/{segmentId}/{companionId}")
     public Page<ChatMessageDto> openChat(
             @AuthUserId Long authUserId,
             @PathVariable(name = "segmentId") Long segmentId,
-            @PathVariable(name = "interlocutorId") Long interlocutorId,
-            @PageableDefault(size = 15) Pageable pageable) {
-        return chatService.openChat(authUserId, segmentId, interlocutorId, pageable);
+            @PathVariable(name = "companionId") Long companionId,
+            @PageableDefault(size = 40) Pageable pageable) {
+        return chatService.openChat(authUserId, segmentId, companionId, pageable);
     }
 
     @GetMapping("/all")

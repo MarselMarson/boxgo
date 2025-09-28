@@ -41,7 +41,7 @@ public class ChatMessage {
     @Column(name = "status", nullable = false, length = 32)
     private String status;
 
-    @Column(name = "frontend_id", unique = true)
+    @Column(name = "frontend_id")
     private UUID frontendId;
 
     @Version

@@ -127,7 +127,7 @@ public class MessagingServiceImpl implements MessagingService {
 
     public void updateUnreadChatsCount(Long userId, Long unreadChatsCount, Long unreadChatsCountVersion) {
         UnreadChatsDto notification = UnreadChatsDto.builder()
-                .type(WebsocketMessageType.UNREAD_TOTAL.name())
+                .type(WebsocketMessageType.UNREAD_TOTAL.getTitle())
                 .unreadChatsTotal(unreadChatsCount)
                 .unreadChatsVersion(unreadChatsCountVersion)
                 .build();
