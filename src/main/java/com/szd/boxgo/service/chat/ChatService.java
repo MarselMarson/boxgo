@@ -56,8 +56,6 @@ public class ChatService {
         Long unreadCount = messageRepoService.countByChatIdAndStatusAndSender(chat.getId(), MessageStatus.SENT.toString(), chatMessage.getSender().getId());
         chatProxy.setUnreadMessagesCount(unreadCount);
 
-        setChatLastMessage(chatMessage);
-
         return chatMessage;
     }
 

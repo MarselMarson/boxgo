@@ -126,7 +126,7 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
 
     public void handleUnsupportedMessage(WebSocketSession session, TextMessage message) {
         log.warn("Unsupported message: {}, session: {}", message, session.getId());
-        sessionService.terminate(session);
+        //sessionService.terminate(session);
     }
 
     @Override

@@ -231,13 +231,12 @@ public class ListingService {
             return page.map(segmentMapper::toDto);
         }
 
-        Set<Long> listingIds = page.getContent().stream()
-                .map(segment -> segment.getListing().getId())
+        Set<Listing> listings = page.getContent().stream()
+                .map(RouteSegment::getListing)
                 .collect(Collectors.toSet());
 
-        List<Package> packages = packageRepo.findByIsArchivedFalseAndListingIdIn(listingIds);
-
-        Map<Long, List<PackageDto>> packagesByListingId = packages.stream()
+        Map<Long, List<PackageDto>> packagesByListingId = listings.stream()
+                .flatMap(listing -> listing.getPackages().stream())
                 .collect(Collectors.groupingBy(
                         p -> p.getListing().getId(),
                         Collectors.mapping(packageMapper::toDto, Collectors.toList())
