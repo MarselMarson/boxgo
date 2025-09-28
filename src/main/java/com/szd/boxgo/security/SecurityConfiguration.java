@@ -32,7 +32,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 @RequiredArgsConstructor
 @OpenAPIDefinition(
-        info = @Info(title = "Пример генерации OpenAPI из Spring MVC", version = "1.0.0"),
+        info = @Info(title = "GO BOX API", version = "1.0.0"),
         security = @SecurityRequirement(name = "BearerAuth"))
 @SecurityScheme(
         type = SecuritySchemeType.HTTP,
@@ -42,6 +42,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
+    private final AppVersionAndLocaleFilter appVersionAndLocaleFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -60,7 +61,7 @@ public class SecurityConfiguration {
                         // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/hi", "/listings", "/listings/get/**").permitAll()
-                        .requestMatchers("/about-us/**", "support-service").permitAll()
+                        .requestMatchers("/about-us/**", "/support-service").permitAll()
                         .requestMatchers("/offer/**").permitAll()
                         .requestMatchers("/websocket/**").permitAll()
                         .requestMatchers("/.well-known/apple-app-site-association").permitAll()
@@ -68,10 +69,12 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(appVersionAndLocaleFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
+                        .accessDeniedHandler(new CustomAccessDeniedHandler())
+                );
         return http.build();
     }
 

@@ -1,13 +1,18 @@
 package com.szd.boxgo.websocket.global;
 
 import com.szd.boxgo.entity.chat.WebsocketErrorCode;
+import com.szd.boxgo.exception.InvalidTokenException;
+import com.szd.boxgo.exception.TokenIsMissingException;
+import com.szd.boxgo.exception.UserDeletedOrBannedException;
+import com.szd.boxgo.i18n.AppLocale;
+import com.szd.boxgo.i18n.AppMessages;
+import com.szd.boxgo.security.AppVersionAndLocaleFilter;
 import com.szd.boxgo.websocket.MyWebSocketHandler;
 import com.szd.boxgo.websocket.global.auth.WebSocketAuthenticator;
 import com.szd.boxgo.websocket.global.message.handler.MessageHandler;
 import com.szd.boxgo.websocket.global.message.handler.MessagingService;
 import com.szd.boxgo.websocket.global.session.SessionRepository;
 import com.szd.boxgo.websocket.global.session.SessionService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
@@ -16,8 +21,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.naming.AuthenticationException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,17 +31,19 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
     private final WebSocketAuthenticator authenticator;
     private final MessagingService messagingService;
     private final UserDataService userDataService;
+    private final AppVersionAndLocaleFilter versionFilter;
 
     public GlobalWebSocketHandler(List<MessageHandler> messageHandlers,
                                   SessionRepository sessionRepository,
                                   SessionService sessionService,
                                   WebSocketAuthenticator authenticator,
-                                  MessagingService messagingService, UserDataService userDataService) {
+                                  MessagingService messagingService, UserDataService userDataService, AppVersionAndLocaleFilter versionFilter) {
         super(sessionRepository, sessionService);
         this.messageHandlers = messageHandlers;
         this.authenticator = authenticator;
         this.messagingService = messagingService;
         this.userDataService = userDataService;
+        this.versionFilter = versionFilter;
     }
 
     @Override
@@ -72,24 +77,35 @@ public class GlobalWebSocketHandler extends MyWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NotNull WebSocketSession session) {
-        try {
-            Map<String, Object> attributes = session.getAttributes();
-            String authHeader = (String) attributes.get("Authorization");
+        Map<String, Object> attributes = session.getAttributes();
+        String authHeader = (String) attributes.get("Authorization");
+        String lang = (String) attributes.get(AppLocale.ATTR_LANG);
+        String appVersion = (String) attributes.get(AppVersionAndLocaleFilter.HEADER_APP_VERSION);
 
+        if (!versionFilter.checkVersion(appVersion)) {
+            handleFailedAuth(session, WebsocketErrorCode.APP_VERSION_DEPRECATED.getCode(),
+                    AppMessages.get(lang, AppMessages.KEY_APP_VERSION_EXPIRED));
+            return;
+        }
+
+        try {
             handleSuccessfulAuth(authenticator.authenticate(authHeader).getId(), session);
-        } catch (AuthenticationException e) {
+        } catch (TokenIsMissingException e) {
             log.warn("Authentication failed: {}", e.getMessage());
-            handleFailedAuth(session, WebsocketErrorCode.TOKEN_INVALID.getCode(), e.getMessage());
-        } catch (EntityNotFoundException e) {
+            handleFailedAuth(session, WebsocketErrorCode.TOKEN_INVALID.getCode(),
+                    AppMessages.get(lang, AppMessages.KEY_TOKEN_IS_MISSING));
+        } catch (InvalidTokenException e) {
+            log.warn("Authentication failed: {}", e.getMessage());
+            handleFailedAuth(session, WebsocketErrorCode.TOKEN_INVALID.getCode(),
+                    AppMessages.get(lang, AppMessages.KEY_TOKEN_EXPIRED));
+        } catch (UserDeletedOrBannedException e) {
             log.warn("User auth failed: {}", e.getMessage());
-            handleFailedAuth(session, WebsocketErrorCode.USER_DELETED_OR_BANNED.getCode(), e.getMessage());
+            handleFailedAuth(session, WebsocketErrorCode.USER_DELETED_OR_BANNED.getCode(),
+                    AppMessages.get(lang, AppMessages.KEY_USER_BLOCKED));
         } catch (Exception e) {
             log.error("Error during WebSocket connection establishment: " + e.getMessage());
-            try {
-                session.close(CloseStatus.SERVER_ERROR);
-            } catch (IOException ex) {
-                log.error("Error closing session: " + ex.getMessage());
-            }
+            handleFailedAuth(session, WebsocketErrorCode.KEY_GENERIC_ERROR.getCode(),
+                    AppMessages.get(lang, AppMessages.KEY_GENERIC_ERROR));
         }
     }
 

@@ -71,3 +71,6 @@ aws:
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_KEY}
     region: eu-north-1
+
+app:
+  min-supported-version: 2.3.0

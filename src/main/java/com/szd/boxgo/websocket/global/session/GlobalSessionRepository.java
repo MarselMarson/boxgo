@@ -50,7 +50,7 @@ class GlobalSessionRepository implements SessionRepository {
         if (userId != null) {
             userSessions.computeIfPresent(userId, (key, sessions) -> {
                 sessions.remove(session);
-                return sessions.isEmpty() ? sessions : null;
+                return sessions.isEmpty() ? null : sessions;
             });
         }
 

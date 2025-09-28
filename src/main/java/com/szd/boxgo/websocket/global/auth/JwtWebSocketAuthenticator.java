@@ -1,6 +1,9 @@
 package com.szd.boxgo.websocket.global.auth;
 
 import com.szd.boxgo.entity.User;
+import com.szd.boxgo.exception.InvalidTokenException;
+import com.szd.boxgo.exception.TokenIsMissingException;
+import com.szd.boxgo.exception.UserDeletedOrBannedException;
 import com.szd.boxgo.security.JwtService;
 import com.szd.boxgo.service.user.UserRepoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,25 +24,24 @@ class JwtWebSocketAuthenticator implements WebSocketAuthenticator {
     public User authenticate(String jwtToken) throws AuthenticationException, EntityNotFoundException {
         try {
             if (jwtToken == null || jwtToken.trim().isEmpty()) {
-                throw new AuthenticationException("Token is missing");
+                throw new TokenIsMissingException("Token is missing");
             }
 
             String jwtTokenWithoutBearer = jwtToken;
-            // Удаляем префикс "Bearer " если он присутствует
             if (jwtToken.startsWith("Bearer ")) {
                 jwtTokenWithoutBearer = jwtToken.substring(7);
             }
 
             if (!jwtService.isTokenNotExpired(jwtTokenWithoutBearer)) {
-                throw new AuthenticationException("Token expired");
+                throw new InvalidTokenException("Token expired");
             }
 
             String username = jwtService.extractUserName(jwtTokenWithoutBearer);
 
             return userRepo.getUser(username)
-                    .orElseThrow(() -> new EntityNotFoundException("User deleted or banned"));
+                    .orElseThrow(() -> new UserDeletedOrBannedException("User deleted or banned"));
 
-        } catch (AuthenticationException | EntityNotFoundException e) {
+        } catch (InvalidTokenException | EntityNotFoundException | UserDeletedOrBannedException e) {
             throw e;
         } catch (Exception e) {
             throw new AuthenticationException("Invalid token");

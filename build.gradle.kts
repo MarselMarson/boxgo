@@ -52,7 +52,6 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-spatial:6.6.1.Final")
     implementation("io.lettuce:lettuce-core:6.5.4.RELEASE")
 
-
     /**
      * Utils & Logging
      */
@@ -85,6 +84,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.springframework:spring-test:6.2.8")
 }
 
 tasks.withType<Test> {

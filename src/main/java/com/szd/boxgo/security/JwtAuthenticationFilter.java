@@ -1,6 +1,7 @@
 package com.szd.boxgo.security;
 
 import com.szd.boxgo.entity.User;
+import com.szd.boxgo.exception.UserDeletedOrBannedException;
 import com.szd.boxgo.service.security.SecurityUserService;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Получаем токен из заголовка
         var authHeader = request.getHeader(HEADER_NAME);
-        if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
+        if (StringUtils.isBlank(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -55,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var username = jwtService.extractUserName(jwt);
 
 
-            if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (StringUtils.isNotBlank(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 User userDetails = userService.findUserByEmail(username);
 
                 if (jwtService.isTokenNotExpired(jwt)) {
@@ -71,10 +72,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     context.setAuthentication(authToken);
                     SecurityContextHolder.setContext(context);
 
+                } else {
+                    throw new JwtException("Token expired");
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (JwtException | EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
+            resolver.resolveException(request, response, null,
+                    new UserDeletedOrBannedException("User deleted or banned"));
+        } catch (JwtException e) {
             resolver.resolveException(request, response, null, e);
         }
     }
