@@ -8,6 +8,7 @@ import com.szd.boxgo.dto.notification.ChatReadEvent;
 import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.chat.Chat;
 import com.szd.boxgo.entity.chat.ChatMessage;
+import com.szd.boxgo.entity.chat.MessageStatus;
 import com.szd.boxgo.mapper.ChatMapper;
 import com.szd.boxgo.mapper.ChatMessageMapper;
 import com.szd.boxgo.mapper.UserMapper;
@@ -45,6 +46,15 @@ public class ChatService {
                 newMessageDto.getSegmentId());
 
         ChatMessage chatMessage = messageService.saveMessage(newMessageDto, chat, senderId);
+
+        Chat chatProxy = entityManager.getReference(Chat.class, chat.getId());
+        chatProxy.setLastMessage(chatMessage);
+        chatProxy.setLastMessageCreatedAt(chatMessage.getCreatedAt());
+        chatProxy.setLastMessageContent(chatMessage.getContent());
+        chatProxy.setLastMessageSender(chatMessage.getSender());
+
+        Long unreadCount = messageRepoService.countByChatIdAndStatusAndSender(chat.getId(), MessageStatus.SENT.toString(), chatMessage.getSender().getId());
+        chatProxy.setUnreadMessagesCount(unreadCount);
 
         setChatLastMessage(chatMessage);
 

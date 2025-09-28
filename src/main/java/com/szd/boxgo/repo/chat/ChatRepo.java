@@ -2,6 +2,7 @@ package com.szd.boxgo.repo.chat;
 
 import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.chat.Chat;
+import com.szd.boxgo.entity.chat.ChatMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,7 +24,7 @@ public interface ChatRepo extends JpaRepository<Chat, Long> {
     @Modifying
     @Query(
             """
-                UPDATE Chat c SET c.lastMessage.id = :lastMessageId,
+                UPDATE Chat c SET c.lastMessage = :lastMessage,
                     c.lastMessageCreatedAt = :lastMessageCreatedAt,
                     c.lastMessageContent = :lastMessageContent,
                     c.lastMessageSender = :lastMessageSender,
@@ -37,7 +38,8 @@ public interface ChatRepo extends JpaRepository<Chat, Long> {
                            @Param("lastMessageId") Long lastMessageId,
                            @Param("lastMessageCreatedAt") OffsetDateTime lastMessageCreatedAt,
                            @Param("lastMessageContent") String lastMessageContent,
-                           @Param("lastMessageSender") User lastMessageSender
+                           @Param("lastMessageSender") User lastMessageSender,
+                           @Param("lastMessage") ChatMessage lastMessage
     );
 
     @Query(

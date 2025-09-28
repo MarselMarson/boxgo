@@ -24,6 +24,10 @@ public class ChatMessageRepoService {
                 .orElseThrow(() -> new EntityNotFoundException("message with id: " + id + " not found"));
     }
 
+    public Long countByChatIdAndStatusAndSender(Long chatId, String status, Long senderId) {
+        return messageRepo.countByChatIdAndStatusAndSender(chatId, status, senderId);
+    }
+
     @Transactional
     public void setMessagesStatusToRead(Long chatId, Long userId) {
         messageRepo.setMessagesStatusToRead(chatId, userId);

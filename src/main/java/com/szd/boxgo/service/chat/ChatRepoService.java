@@ -84,7 +84,8 @@ public class ChatRepoService {
                 lastMessage.getId(),
                 lastMessage.getCreatedAt(),
                 lastMessage.getContent(),
-                lastMessage.getSender()
+                lastMessage.getSender(),
+                lastMessage
         );
     }
 

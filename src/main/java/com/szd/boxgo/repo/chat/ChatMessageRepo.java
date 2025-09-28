@@ -25,6 +25,10 @@ public interface ChatMessageRepo extends JpaRepository<ChatMessage, Long>, JpaSp
     """)
     void setMessagesStatusToRead(Long chatId, Long recipientId);
 
+    @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.chat.id = :chatId AND m.status = :status AND m.sender.id = :senderId")
+    Long countByChatIdAndStatusAndSender(@Param("chatId") Long chatId, @Param("status") String status, @Param("senderId") Long senderId);
+
+
     @Modifying
     @Query("""
         UPDATE ChatMessage cm
