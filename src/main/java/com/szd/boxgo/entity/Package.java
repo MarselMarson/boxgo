@@ -42,7 +42,7 @@ public class Package {
             joinColumns = @JoinColumn(name = "package_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @Fetch(FetchMode.JOIN)
+    @Fetch(FetchMode.SUBSELECT)
     Set<Category> categories;
 
     @Column(name = "length")

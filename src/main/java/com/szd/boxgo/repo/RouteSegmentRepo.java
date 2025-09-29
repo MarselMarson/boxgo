@@ -13,7 +13,8 @@ import java.time.OffsetDateTime;
 
 @Repository
 public interface RouteSegmentRepo extends JpaRepository<RouteSegment, Long>, JpaSpecificationExecutor<RouteSegment> {
-    @EntityGraph(attributePaths = {"listing", "listing.packages", "listing.owner", ""})
+    @EntityGraph(attributePaths = {"listing", "listing.packages", "listing.owner",
+            "listing.packages.categories"})
     @NotNull Page<RouteSegment> findAll(@NotNull Specification<RouteSegment> spec, @NotNull Pageable pageable);
 
     @Modifying
