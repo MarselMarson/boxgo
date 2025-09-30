@@ -11,6 +11,7 @@ import com.szd.boxgo.entity.VerificationCode;
 import com.szd.boxgo.entity.VerificationPurpose;
 import com.szd.boxgo.entity.chat.UnreadChatsCountVersion;
 import com.szd.boxgo.exception.CodeNotFoundException;
+import com.szd.boxgo.exception.EmailAlreadyExistsException;
 import com.szd.boxgo.mapper.UserMapper;
 import com.szd.boxgo.security.JwtService;
 import com.szd.boxgo.service.VerificationCodeService;
@@ -162,6 +163,8 @@ public class AuthenticationService {
                     lowerCaseEmail,
                     VerificationPurpose.REGISTRATION.toString());
             mailService.sendConfirmationEmail(lowerCaseEmail, code.getCode());
+        } else {
+            throw new EmailAlreadyExistsException("Этот адрес электронной почты уже зарегистрирован");
         }
     }
 }
