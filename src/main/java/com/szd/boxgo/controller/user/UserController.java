@@ -1,10 +1,7 @@
 package com.szd.boxgo.controller.user;
 
 import com.szd.boxgo.dto.auth.AuthUserId;
-import com.szd.boxgo.dto.user.ChangePasswordDto;
-import com.szd.boxgo.dto.user.PasswordDto;
-import com.szd.boxgo.dto.user.UserDto;
-import com.szd.boxgo.dto.user.UserPatchDto;
+import com.szd.boxgo.dto.user.*;
 import com.szd.boxgo.service.user.UserManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +39,25 @@ public class UserController {
     @PostMapping("/me/change-password")
     public void changePassword(@AuthUserId Long userId, @RequestBody ChangePasswordDto dto) {
         userService.changePassword(userId, dto);
+    }
+
+    @Operation(summary = "Запрос на смену почты")
+    @PostMapping("/me/send-change-email-code")
+    public void sendEmailChangeCode(@AuthUserId Long userId) {
+        userService.sendEmailChangeCode(userId);
+    }
+
+    //TODO
+    @Operation(summary = "Смена почты")
+    @PostMapping("/me/change-email")
+    public void changeEmail(@AuthUserId Long userId, @RequestBody ChangeEmailDto dto) {
+        userService.changeEmail(userId, dto);
+    }
+
+    @Operation(summary = "Подтвердить новую почту")
+    @PostMapping("/me/prove-email")
+    public void proveEmail(@AuthUserId Long userId, @RequestBody ChangeEmailDto dto) {
+        userService.proveEmail(userId, dto);
     }
 
     @Operation(summary = "Удалить аккаунт")

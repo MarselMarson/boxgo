@@ -50,6 +50,12 @@ public class AuthController {
         authenticationService.resetPassword(resetPasswordDto);
     }
 
+    @Operation(summary = "Проверить код восстановления пароля")
+    @PostMapping("/check-reset-password-code")
+    public void checkResetPasswordCode(@RequestBody ResetPasswordDto resetPasswordDto) {
+        authenticationService.checkResetPasswordCode(resetPasswordDto);
+    }
+
     @Operation(summary = "Запрос на восстановление пароля")
     @PostMapping("/request-password-reset")
     public void resetPasswordRequest(@RequestBody EmailDto email) {

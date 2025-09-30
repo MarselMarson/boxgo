@@ -104,7 +104,43 @@ public class MailService {
                             <p/>
                             <p>Код действителен в течение 10 минут.</p>
                             <p/>
-                            <p>Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.</p>
+                            <p>Если вы не запрашивали изменение пароля, просто проигнорируйте это письмо.</p>
+                            <p>Никаких действий предпринимать не нужно.</p>
+                            <p/>
+                            <p>С наилучшими пожеланиями,<br>Команда GO BOX</p>
+                        </body>
+                    </html>
+                    """.formatted(code);
+
+            helper.setText(htmlContent, true);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+        mailSender.send(mimeMessage);
+    }
+
+    public void sendChangeEmail(String email, String code) {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject("Подтверждение смены email в приложении Go BOX");
+
+            String htmlContent = """
+                    <html>
+                        <body>
+                            <p>Здравствуйте!</p>
+                            <p/>
+                            <p>Вы запросили смену email в приложении Go BOX.</p>
+                            <p>Пожалуйста, введите следующий код подтверждения:</p>
+                            <p/>
+                            <p><div style="border: 2px dashed #4CAF50; padding: 10px; font-size: 18px; font-weight: bold; color: #333; background-color: #f9f9f9; text-align: center;">%s</div></p>
+                            <p/>
+                            <p>Код действителен в течение 10 минут.</p>
+                            <p/>
+                            <p>Если вы не запрашивали изменение email, просто проигнорируйте это письмо.</p>
                             <p>Никаких действий предпринимать не нужно.</p>
                             <p/>
                             <p>С наилучшими пожеланиями,<br>Команда GO BOX</p>

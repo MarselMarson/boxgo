@@ -11,7 +11,6 @@ import com.szd.boxgo.entity.VerificationCode;
 import com.szd.boxgo.entity.VerificationPurpose;
 import com.szd.boxgo.entity.chat.UnreadChatsCountVersion;
 import com.szd.boxgo.exception.CodeNotFoundException;
-import com.szd.boxgo.exception.EmailAlreadyExistsException;
 import com.szd.boxgo.mapper.UserMapper;
 import com.szd.boxgo.security.JwtService;
 import com.szd.boxgo.service.VerificationCodeService;
@@ -78,7 +77,6 @@ public class AuthenticationService {
             UnreadChatsCountVersion unreadChatsCountVersion = UnreadChatsCountVersion.builder()
                     .user(createdUser)
                     .build();
-
 
 
             return new JwtAuthenticationResponseDto(
@@ -158,13 +156,23 @@ public class AuthenticationService {
     public void sendRegistrationCode(String email) {
         String lowerCaseEmail = email.toLowerCase();
 
-        if (!emailService.isEmailAlreadyExist(lowerCaseEmail)) {
-            VerificationCode code = verificationCodeService.createVerificationCode(
-                    lowerCaseEmail,
-                    VerificationPurpose.REGISTRATION.toString());
-            mailService.sendConfirmationEmail(lowerCaseEmail, code.getCode());
-        } else {
-            throw new EmailAlreadyExistsException("Этот адрес электронной почты уже зарегистрирован");
+        emailService.checkEmail(lowerCaseEmail);
+        VerificationCode code = verificationCodeService.createVerificationCode(
+                lowerCaseEmail,
+                VerificationPurpose.REGISTRATION.toString());
+        mailService.sendConfirmationEmail(lowerCaseEmail, code.getCode());
+    }
+
+    public void checkResetPasswordCode(ResetPasswordDto resetPasswordDto) {
+        String lowerCaseEmail = resetPasswordDto.getEmail().toLowerCase();
+
+        boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
+                resetPasswordDto.getVerificationCode(),
+                lowerCaseEmail,
+                VerificationPurpose.PASSWORD_RESET.toString());
+
+        if (!isVerificationCodeValid) {
+            throw new CodeNotFoundException("Неверный код подтверждения");
         }
     }
 }

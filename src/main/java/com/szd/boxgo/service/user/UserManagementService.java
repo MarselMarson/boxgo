@@ -1,9 +1,6 @@
 package com.szd.boxgo.service.user;
 
-import com.szd.boxgo.dto.user.ChangePasswordDto;
-import com.szd.boxgo.dto.user.CreateUserDto;
-import com.szd.boxgo.dto.user.UserDto;
-import com.szd.boxgo.dto.user.UserPatchDto;
+import com.szd.boxgo.dto.user.*;
 import com.szd.boxgo.entity.File;
 import com.szd.boxgo.entity.User;
 import com.szd.boxgo.entity.VerificationCode;
@@ -15,6 +12,7 @@ import com.szd.boxgo.repo.UserRepo;
 import com.szd.boxgo.service.FileService;
 import com.szd.boxgo.service.VerificationCodeService;
 import com.szd.boxgo.service.security.PasswordService;
+import com.szd.boxgo.service.user.email.EmailService;
 import com.szd.boxgo.service.user.email.MailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +33,7 @@ public class UserManagementService {
     private final VerificationCodeService verificationCodeService;
     private final MailService mailService;
     private final FileService fileService;
+    private final EmailService emailService;
 
     public User create(@Valid CreateUserDto newUserDto) {
         User user = User.builder()
@@ -141,5 +140,57 @@ public class UserManagementService {
                 user.getEmail(),
                 VerificationPurpose.PASSWORD_CHANGE.toString());
         mailService.sendChangePassword(user.getEmail(), code.getCode());
+    }
+
+    @Transactional
+    public void sendEmailChangeCode(Long userId) {
+        User user = repoService.getUserById(userId);
+
+        VerificationCode codeOldEmail = verificationCodeService.createVerificationCode(
+                user.getEmail(),
+                VerificationPurpose.EMAIL_CHANGE.toString());
+        mailService.sendChangeEmail(user.getEmail(), codeOldEmail.getCode());
+    }
+
+    @Transactional
+    public void changeEmail(Long userId, ChangeEmailDto dto) {
+        User user = repoService.getUserById(userId);
+        if (dto.getNewEmail().equals(user.getEmail())) {
+            throw new DataValidationException("Emails must be different");
+        }
+        emailService.checkEmail(dto.getNewEmail());
+
+        boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
+                dto.getVerificationCodeOldEmail(),
+                user.getEmail(),
+                VerificationPurpose.EMAIL_CHANGE.toString());
+
+        if (isVerificationCodeValid) {
+            verificationCodeService.useCode(dto.getVerificationCodeOldEmail(), user.getEmail());
+        } else {
+            throw new CodeNotFoundException("Неверный код подтверждения");
+        }
+
+        VerificationCode codeNewEmail = verificationCodeService.createVerificationCode(
+                dto.getNewEmail(),
+                VerificationPurpose.EMAIL_PROVE.toString());
+        mailService.sendChangeEmail(dto.getNewEmail(), codeNewEmail.getCode());
+    }
+
+    @Transactional
+    public void proveEmail(Long userId, ChangeEmailDto dto) {
+        User user = repoService.getUserById(userId);
+
+        boolean isVerificationCodeValid = verificationCodeService.checkVerificationCode(
+                dto.getVerificationCodeNewEmail(),
+                dto.getNewEmail(),
+                VerificationPurpose.EMAIL_PROVE.toString());
+
+        if (isVerificationCodeValid) {
+            verificationCodeService.useCode(dto.getVerificationCodeOldEmail(), user.getEmail());
+            user.setEmail(dto.getNewEmail());
+        } else {
+            throw new CodeNotFoundException("Неверный код подтверждения");
+        }
     }
 }
