@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 
 @Repository
 public interface RouteSegmentRepo extends JpaRepository<RouteSegment, Long>, JpaSpecificationExecutor<RouteSegment> {
@@ -39,4 +40,7 @@ public interface RouteSegmentRepo extends JpaRepository<RouteSegment, Long>, Jpa
 
     @Query("SELECT COUNT(rs) FROM RouteSegment rs WHERE rs.archiveAt <= :currentTime AND rs.isArchived = false")
     long countExpiredSegments(@Param("currentTime") OffsetDateTime currentTime);
+
+    @EntityGraph(attributePaths = {"listing.packages"})
+    Optional<RouteSegment> findWithPackagesById(Long id);
 }

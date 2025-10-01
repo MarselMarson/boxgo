@@ -8,6 +8,7 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PackageMapper {
@@ -17,8 +18,11 @@ public interface PackageMapper {
 
     Package toEntity(NewPackageDto pckgDto);
 
-    default List<PackageDto> toDtos(List<Package> packages) {
-        return packages.stream()
+    default List<PackageDto> toDtos(Iterable<Package> packages) {
+        if (packages == null) {
+            return List.of();
+        }
+        return StreamSupport.stream(packages.spliterator(), false)
                 .map(this::toDto)
                 .toList();
     }

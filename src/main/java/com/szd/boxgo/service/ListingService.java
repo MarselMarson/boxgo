@@ -264,4 +264,19 @@ public class ListingService {
         listing.setIsArchived(true);
         listing.getRouteSegments().forEach(segment -> segment.setIsArchived(true));
     }
+
+    public SegmentDto getSegmentById(Long id) {
+        RouteSegment segment = segmentRepo.findWithPackagesById(id)
+                .orElse(null);
+
+        if (segment == null) {
+            return new SegmentDto();
+        }
+
+        Set<Package> packages = segment.getListing().getPackages();
+
+        SegmentDto dto = segmentMapper.toDto(segment);
+        dto.setAvailablePackages(packageMapper.toDtos(packages));
+        return dto;
+    }
 }

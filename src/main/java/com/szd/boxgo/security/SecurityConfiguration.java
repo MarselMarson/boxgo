@@ -60,7 +60,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request -> request
                         // Можно указать конкретный путь, * - 1 уровень вложенности, ** - любое количество уровней вложенности
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/hi", "/listings", "/listings/get/**").permitAll()
+                        .requestMatchers("/hi", "/listings", "/listings/get/**", "/listings/segment/**").permitAll()
                         .requestMatchers("/about-us/**", "/support-service").permitAll()
                         .requestMatchers("/offer/**").permitAll()
                         .requestMatchers("/websocket/**").permitAll()

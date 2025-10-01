@@ -44,6 +44,11 @@ public class ListingsController {
         return listingService.getById(id);
     }
 
+    @GetMapping("/segment/{id}")
+    public SegmentDto getSegmentById(@PathVariable Long id) {
+        return listingService.getSegmentById(id);
+    }
+
     @DeleteMapping("/delete/{id}")
     public void deleteById(@PathVariable Long id, @AuthUserId Long userId) {
         listingService.archiveById(id, userId);
