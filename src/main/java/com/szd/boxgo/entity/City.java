@@ -6,6 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "city")
 @Data
@@ -31,4 +34,7 @@ public class City {
     @JoinColumn(name = "countryid")
     @Fetch(FetchMode.JOIN)
     Country country;
+
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CityTranslation> translations = new HashSet<>();
 }

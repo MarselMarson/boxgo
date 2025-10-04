@@ -15,7 +15,16 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(target = "photoUrl", source = "photo.url")
+    @Mapping(target = "lastSeen", source = "updatedAt", qualifiedByName = "offsetToMilliseconds")
     UserDto toDto(User user);
+
+    @Named("offsetToMilliseconds")
+    default Long offsetToMilliseconds(OffsetDateTime date) {
+        if (date == null) {
+            return null;
+        }
+        return date.toInstant().toEpochMilli();
+    }
 
     @Mapping(target = "createdAt", ignore = true)
     User toEntity(UserDto userDto);
